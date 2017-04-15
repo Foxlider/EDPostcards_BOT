@@ -10,6 +10,7 @@
 # Installation : 
 #   Just get the keys from twitter (CONSUMER_KEY, CONSUMER_SECRET, ACCESS_KEY, ACCESS_SECRET) 
 #   Put them in a file called keyFile.txt in this EXACT order ! 
+#   Create a 'dl' folder
 #   Launch the BOT
 #   TADAAAAA !
 #

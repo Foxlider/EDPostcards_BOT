@@ -22,3 +22,11 @@ But honestly, why would you run this bot if mine is already running ?
   - tweet [txt] : To send a tweet via the bot's console. txt is the message of the tweet.
 
 THE END
+
+
+# Changelog
+
+## [ Version 1.3 ]
+- Now making sure a data folder exists on Linux
+- Logging when receiving a tweet
+- Stuff...

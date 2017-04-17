@@ -137,6 +137,7 @@ class MyStreamListener(tweepy.StreamListener):
 ## The bot itself  
 
 print("BOT " + __program__ + " v" + __version__ + " started. \nConnection...")
+logStart()
 
 try:
     api.update_profile(location="Sol")

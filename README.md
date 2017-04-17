@@ -9,16 +9,16 @@ And this lil BOT is born. THE END
 
 
 # Installation : 
-  Just get the keys from twitter (CONSUMER_KEY, CONSUMER_SECRET, ACCESS_KEY, ACCESS_SECRET) 
-  Put them in a file called keyFile.txt in this EXACT order ! 
-  Create an 'dl' folder
-  Launch the BOT
-  TADAAAAA !
+  - Just get the keys from twitter (CONSUMER_KEY, CONSUMER_SECRET, ACCESS_KEY, ACCESS_SECRET) 
+  - Put them in a file called keyFile.txt in this EXACT order ! 
+  - Create an 'dl' folder
+  - Launch the BOT
+  - TADAAAAA !
 
 But honestly, why would you run this bot if mine is already running ?
 
 # Commands
-  shutdown    : To shutdown the BOT (quite obvious)
-  tweet [txt] : To send a tweet via the bot's console. txt is the message of the tweet.
+  - shutdown    : To shutdown the BOT (quite obvious)
+  - tweet [txt] : To send a tweet via the bot's console. txt is the message of the tweet.
 
 THE END

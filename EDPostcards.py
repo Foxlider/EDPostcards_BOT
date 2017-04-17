@@ -28,6 +28,7 @@ __program__ = "EDP Bot"
 __version__ = "1.3a"
 
 ##Libraries imports
+import datetime
 import tweepy
 import wget
 import time

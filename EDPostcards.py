@@ -25,7 +25,7 @@
 
 #Basic informations 
 __program__ = "EDP Bot"
-__version__ = "1.2a"
+__version__ = "1.3a"
 
 ##Libraries imports
 import tweepy
@@ -52,6 +52,12 @@ auth.set_access_token(ACCESS_KEY, ACCESS_SECRET)
 api = tweepy.API(auth)
 media_files = set()
 
+global datadir
+datadir = os.path.dirname("./data/")
+if not os.path.exists(datadir):
+os.makedirs(datadir)
+
+
 ##Functions and classes
 
 def dl(media_files):
@@ -67,6 +73,30 @@ def dl(media_files):
         dl_files.add("dl\img"+str(i)+".jpg")
     return dl_files
 
+def logStart():
+    dir = os.path.dirname("./logs/")
+    if not os.path.exists(dir):
+        os.makedirs(dir)
+    today = datetime.datetime.now()
+    logsFile=open("./logs/startup.txt","a")
+    log="[" + str(today) + "] : Bot " + __program__ + " v" + __version__ + " logged in\n"
+    logsFile.write(log)
+    print(log,end='')
+    
+def logStatus(status,media):
+    dir = os.path.dirname("./logs/")
+    if not os.path.exists(dir):
+        os.makedirs(dir)
+    today = datetime.datetime.now()
+    logsFile=open("./logs/" + str(today.day) + "-" + str(today.month) + "-" + str(today.year) + ".txt","a")
+    log = str(today.hour) + ":" + str(today.minute) + ":" + str(today.second) + " [" +  str(status.author.screen_name) + "] : " + status.text + "\n"
+    logsFile.write(log)
+    if (media):
+        logsFile.write("Media detexted\n")
+    else:
+        logsFile.write("No media detected")
+    print(log,end='')
+
 class MyStreamListener(tweepy.StreamListener):
     def on_status(self, status):
         author = status.author.screen_name
@@ -77,17 +107,20 @@ class MyStreamListener(tweepy.StreamListener):
             media = status.entities.get('media', []) 
             if(len(media) > 0 ):
                 print (str(len(media))+" media(s) detected")
+                logStatus(status,True)
                 media_files.add(media[0]['media_url']) #IMPROVE IT !
                 dl_files = dl(media_files)
                 id = status.id_str
                 api.retweet(id) # I can't seems to get more than 1 media per tweet and can't seems to send more than 1 media per tweet. So better RT
             else:
                 print("No media detected.\n")
+                logStatus(status,False)
     
     def on_direct_message(self, status): #Can't handle direct message yet. Why ? Dunno.
         author = status.author.screen_name 
         text = status.text
         print(author + " : \n"+text)
+        logStatus(status,False)
         
     def on_error(self, status_code):
         print ("Error Code: " + str(status_code))

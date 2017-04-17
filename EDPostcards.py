@@ -55,7 +55,7 @@ media_files = set()
 global datadir
 datadir = os.path.dirname("./data/")
 if not os.path.exists(datadir):
-os.makedirs(datadir)
+    os.makedirs(datadir)
 
 
 ##Functions and classes

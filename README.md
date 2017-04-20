@@ -30,3 +30,10 @@ THE END
 - Now making sure a data folder exists on Linux
 - Logging when receiving a tweet
 - Stuff...
+
+## [ Version 1.5 ]
+- Creation of logs
+- Now quoting tweets instead of retweeting
+- Whole new organisation of the code
+- Handling more commands
+- Stuff...

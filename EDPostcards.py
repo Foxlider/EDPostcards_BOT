@@ -22,8 +22,8 @@
 # THE END
 
 #Basic informations 
-__program__ = "EDPostcards Bot"
-__version__ = "1.5a"
+__program__ = "EDP Bot"
+__version__ = "1.5b"
 
 ##Libraries imports
 import datetime
@@ -173,7 +173,19 @@ def cmdHandler(cmd, orig=True):
                 api.update_status(status=text)
             except tweepy.TweepError as error:
                 logError(error.args[0][0]['code'], error.args[0][0]['message'])
-        if (cmd.startswith("foo ")):
+        elif (cmd.startswith('quote ')):
+            id = cmd[6:].split(' ')[0]
+            try:
+                decoded = api.get_status(id)
+                #dump(decoded)
+                id = decoded.id
+                sendertag = decoded.author.screen_name
+                qcode, qtext = random.choice(list(quoteText.items()))           #Get one of the quotenswers
+                api.update_status(status = qtext+" https://twitter.com/"+sendertag+"/status/"+str(id))
+                logText("Manually quoting " + sendertag + "'s tweet " + str(id))
+            except tweepy.TweepError as error:
+                logError(error.args[0][0]['code'], error.args[0][0]['message'])
+        elif (cmd.startswith("foo ")):
             text = cmd[4:]
             logText(text)
         

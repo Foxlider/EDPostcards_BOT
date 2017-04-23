@@ -19,7 +19,9 @@ But honestly, why would you run this bot if mine is already running ?
 
 # Commands
   - shutdown    : To shutdown the BOT (quite obvious)
+  - reboot      : To reboot the BOT (broken)
   - tweet [txt] : To send a tweet via the bot's console. txt is the message of the tweet.
+  - quote [id]  : To quote a specific tweet by sending its ID
 
 THE END
 

@@ -23,7 +23,7 @@
 
 #Basic informations 
 __program__ = "EDP Bot"
-__version__ = "1.5b"
+__version__ = "1.5c"
 
 ##Libraries imports
 import datetime
@@ -293,7 +293,7 @@ def directMessageHandler(decoded):
     sender = decoded["direct_message"]["sender"]["name"]            #|
     sendertag = decoded["direct_message"]["sender"]["screen_name"]  #|
     logText("Direct Message n°"+str(id)+"\n\""+text+"\"")           #Write to logs
-    if sender in bigBoss and sendertag != me.screen_name:           #IF PV sent by me and not by the BOT (avoid repeating commands)
+    if sendertag in bigBoss and sendertag != me.screen_name:        #IF PV sent by me and not by the BOT (avoid repeating commands)
         logText ("Receiving direct message from admin : "+text)     #Write to logs
         api.send_direct_message(screen_name=sendertag, text="Handling "+text+" command... Please wait...")                                                 #Send message
         cmdHandler(text, False)                                     #cmdHandler will se if a command is sent or not

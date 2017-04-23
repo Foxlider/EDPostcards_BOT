@@ -32,8 +32,11 @@ THE END
 - Stuff...
 
 ## [ Version 1.5 ]
+###   [ 1.5b ]
 - Creation of logs
 - Now quoting tweets instead of retweeting
 - Whole new organisation of the code
 - Handling more commands
 - Stuff...
+###   [ 1.5c ]
+- Fixed an issue where cmdHandler were not recognizing the BigBoss and not handling commands

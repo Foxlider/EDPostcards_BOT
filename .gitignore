@@ -1,6 +1,8 @@
 #Stuff
 .txt
 data/
+dl/
+logs/
 
 
 # Byte-compiled / optimized / DLL files

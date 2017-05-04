@@ -123,7 +123,7 @@ def dl(media_files,sender):
             logText(str(error)+"\nUnable to download file. Cancelling.")
             logError(156, str(error)+"\nUnable to download file.")
         except:
-            logText("Oops I fuckedup... You didn't wanted this anyway.")
+            logText("Oops I fucked up... You didn't wanted this anyway.")
             logError(157, "Nomething bad happened...")
         dl_files.add(folder+name)
     media_files = set()
@@ -180,7 +180,11 @@ def cmdHandler(cmd, orig=True):
                 #dump(decoded)
                 id = decoded.id
                 sendertag = decoded.author.screen_name
-                qcode, qtext = random.choice(list(quoteText.items()))           #Get one of the quotenswers
+                try:
+                    media = decoded.extended_entities
+                except:
+                    logError(error.args[0][0]['code'], error.args[0][0]['message'])
+                qcode, qtext = random.choice(list(quoteText.items()))           #Get one of the quote answers
                 api.update_status(status = qtext+" https://twitter.com/"+sendertag+"/status/"+str(id))
                 logText("Manually quoting " + sendertag + "'s tweet " + str(id))
             except tweepy.TweepError as error:

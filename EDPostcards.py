@@ -324,7 +324,7 @@ class mainStreamListener(tweepy.StreamListener): #MAIN STREAM TO HANDLE HASHTAG 
     def on_data(self, status):
         #dump(self)
         decoded = json.loads(status)                                #Decode from json
-        print("====================")                               #Separator          
+        #print("====================")                               #Separator          
         #dump(decoded)                                              #UNCOMMENT THIS TO DUMP DATA
         if("direct_message" in decoded):                        #======= DATA IS DIRECT MESSAGE
             directMessageHandler(decoded)
@@ -341,14 +341,14 @@ class mainStreamListener(tweepy.StreamListener): #MAIN STREAM TO HANDLE HASHTAG 
             return True
 
     def on_timeout(self):
-        print('Timeout...')
+        logError(105, 'Timeout...')
         return True
         
 class cmdStreamListener(tweepy.StreamListener): #THIS ONE IS USED FOR COMMANDS HANDLING ONLY
     def on_data(self, status):
         #dump(self)
         decoded = json.loads(status)                                #Decode from json
-        print("====================")                               #Separator          
+        #print("====================")                               #Separator          
         #dump(decoded)                                              #UNCOMMENT THIS TO DUMP DATA
         if("direct_message" in decoded):                        #======= DATA IS DIRECT MESSAGE
             directMessageHandler(decoded)

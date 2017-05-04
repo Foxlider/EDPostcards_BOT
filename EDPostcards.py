@@ -23,7 +23,7 @@
 
 #Basic informations 
 __program__ = "EDP Bot"
-__version__ = "1.5c"
+__version__ = "1.6a"
 
 ##Libraries imports
 import datetime
@@ -181,7 +181,13 @@ def cmdHandler(cmd, orig=True):
                 id = decoded.id
                 sendertag = decoded.author.screen_name
                 try:
-                    media = decoded.extended_entities
+                    media = decoded.extended_entities.media
+                    media_files=set()
+                    sender = decoded.user.name
+                    if (len(media)>=1):                                                 #Did we got some medias ?
+                        for i in media:
+                            media_files.add(i["media_url"])                             #Add medias to var
+                        dl(media_files,sender)                                          #Get those medias in your files
                     logText(str(media))
                 except Exception as error:
                     logText("Oops ! I slipped in a "+str(error))

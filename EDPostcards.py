@@ -322,7 +322,7 @@ def directMessageHandler(decoded):
 class mainStreamListener(tweepy.StreamListener): #MAIN STREAM TO HANDLE HASHTAG TREATMENT
     #TODO: Make functions to handle treatments
     def on_data(self, status):
-        dump(self)
+        #dump(self)
         decoded = json.loads(status)                                #Decode from json
         print("====================")                               #Separator          
         #dump(decoded)                                              #UNCOMMENT THIS TO DUMP DATA
@@ -346,7 +346,7 @@ class mainStreamListener(tweepy.StreamListener): #MAIN STREAM TO HANDLE HASHTAG 
         
 class cmdStreamListener(tweepy.StreamListener): #THIS ONE IS USED FOR COMMANDS HANDLING ONLY
     def on_data(self, status):
-        dump(self)
+        #dump(self)
         decoded = json.loads(status)                                #Decode from json
         print("====================")                               #Separator          
         #dump(decoded)                                              #UNCOMMENT THIS TO DUMP DATA

@@ -181,7 +181,7 @@ def cmdHandler(cmd, orig=True):
                 id = decoded.id
                 sendertag = decoded.author.screen_name
                 try:
-                    media = decoded.extended_entities.media
+                    media = decoded.extended_entities["media"]
                     media_files=set()
                     sender = decoded.user.name
                     if (len(media)>=1):                                                 #Did we got some medias ?

@@ -182,8 +182,10 @@ def cmdHandler(cmd, orig=True):
                 sendertag = decoded.author.screen_name
                 try:
                     media = decoded.extended_entities
-                except:
-                    logError(error.args[0][0]['code'], error.args[0][0]['message'])
+                    logText(str(media))
+                except Exception as error:
+                    logText("Oops ! I slipped in a "+str(error))
+                    logError(123, str(error))
                 qcode, qtext = random.choice(list(quoteText.items()))           #Get one of the quote answers
                 api.update_status(status = qtext+" https://twitter.com/"+sendertag+"/status/"+str(id))
                 logText("Manually quoting " + sendertag + "'s tweet " + str(id))

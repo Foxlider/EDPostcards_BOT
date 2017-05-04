@@ -42,3 +42,9 @@ THE END
 - Stuff...
 ###   [ 1.5c ]
 - Fixed an issue where cmdHandler were not recognizing the BigBoss and not handling commands
+
+## [ Version 1.6 ]
+- Handling Follow back errors
+- Handling medias in manual quotes
+- Text corrections
+- Stuff...

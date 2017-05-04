@@ -23,7 +23,7 @@
 
 #Basic informations 
 __program__ = "EDP Bot"
-__version__ = "1.6a"
+__version__ = "1.6c"
 
 ##Libraries imports
 import datetime
@@ -175,28 +175,7 @@ def cmdHandler(cmd, orig=True):
                 logError(error.args[0][0]['code'], error.args[0][0]['message'])
         elif (cmd.startswith('quote ')):
             id = cmd[6:].split(' ')[0]
-            try:
-                decoded = api.get_status(id)
-                #dump(decoded)
-                id = decoded.id
-                sendertag = decoded.author.screen_name
-                try:
-                    media = decoded.extended_entities["media"]
-                    media_files=set()
-                    sender = decoded.user.name
-                    if (len(media)>=1):                                                 #Did we got some medias ?
-                        for i in media:
-                            media_files.add(i["media_url"])                             #Add medias to var
-                        dl(media_files,sender)                                          #Get those medias in your files
-                    logText(str(media))
-                except Exception as error:
-                    logText("Oops ! I slipped in a "+str(error))
-                    logError(123, str(error))
-                qcode, qtext = random.choice(list(quoteText.items()))           #Get one of the quote answers
-                api.update_status(status = qtext+" https://twitter.com/"+sendertag+"/status/"+str(id))
-                logText("Manually quoting " + sendertag + "'s tweet " + str(id))
-            except tweepy.TweepError as error:
-                logError(error.args[0][0]['code'], error.args[0][0]['message'])
+            manualStatusHandler(id)
         elif (cmd.startswith("foo ")):
             text = cmd[4:]
             logText(text)
@@ -276,6 +255,36 @@ def statusTreatment(decoded):
         qcode, qtext = random.choice(list(quoteText.items()))           #Get one of the quotenswers
         api.update_status(status = qtext+" https://twitter.com/"+sendertag+"/status/"+str(id))
 
+        
+def manualStatusHandler(id):
+    """
+        manual status handler function.
+        called by the cmdHandler when cmd quote is called. 
+        params : 
+            decoded     : The status
+    """
+    try:
+        decoded = api.get_status(id)
+        #dump(decoded)
+        id = decoded.id
+        sendertag = decoded.author.screen_name
+        try:
+            media = decoded.extended_entities["media"]
+            media_files=set()
+            sender = decoded.user.name
+            if (len(media)>=1):                                                 #Did we got some medias ?
+                for i in media:
+                    media_files.add(i["media_url"])                             #Add medias to var
+                dl(media_files,sender)                                          #Get those medias in your files
+        except Exception as error:
+            logText("Oops ! I slipped in a "+str(error))
+            logError(123, str(error))
+        qcode, qtext = random.choice(list(quoteText.items()))           #Get one of the quote answers
+        api.update_status(status = qtext+" https://twitter.com/"+sendertag+"/status/"+str(id))
+        logText("Manually quoting " + sendertag + "'s tweet " + str(id))
+    except tweepy.TweepError as error:
+        logError(error.args[0][0]['code'], error.args[0][0]['message'])
+        
 def statusHandler(decoded):
     """
         main status treatment function.

@@ -398,7 +398,10 @@ logText(str(me.followers_count)+" followers : ")
 for follower in me.followers():
    logText(" -"+follower.screen_name)
    if (not follower.following):
-       follower.follow()
+        try:
+            follower.follow()
+        except tweepy.TweepError:
+            logError(421, str(tweepy.TweepError)+" Follow error.")
 
 try:
     if mainStream.running or cmdStream:

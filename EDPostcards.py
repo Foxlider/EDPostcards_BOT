@@ -148,7 +148,7 @@ def frestart():
     """
         this function is supposed to shutdown then restart the bot
     """
-    os.system("./EDPostcards.sh")
+    os.system("./../EDPostcards.sh")
     #fshutdown()
     #python = sys.executable
     

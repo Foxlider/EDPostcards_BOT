@@ -140,18 +140,18 @@ def fshutdown():
     mainStream.disconnect()
     cmdStream.disconnect()
     logText("Shuting down...")
-    txt = "pkill -9 -f " + str(os.path.realpath(__file__))
-    print(txt)
-    #os.system()
+    os.system("pkill EDPostcards")
     sys.exit()
-    logText("Impossible to Shut down")
+    logText("Impossible to Shutdown")
         
 def frestart():
     """
         this function is supposed to shutdown then restart the bot
     """
-    fshutdown()
-    python = sys.executable
+    os.system("./EDPostcards.sh")
+    #fshutdown()
+    #python = sys.executable
+    
     #FIXME: Need to restart the program
     #os.execl(python, python, * sys.argv)
 

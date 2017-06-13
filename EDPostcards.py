@@ -140,7 +140,8 @@ def fshutdown():
     mainStream.disconnect()
     cmdStream.disconnect()
     logText("Shuting down...")
-    sys.exit(0)
+    os.system("pkill -9 -f "+str(os.path.realpath(__file__)))
+    sys.exit()
         
 def frestart():
     """

@@ -140,6 +140,7 @@ def fshutdown():
     mainStream.disconnect()
     cmdStream.disconnect()
     logText("Shuting down...")
+    sys.exit(0)
         
 def frestart():
     """
@@ -395,7 +396,7 @@ def dump(obj, nested_level=0, output=sys.stdout):
 
 ## The bot itself  
 
-print("BOT " + __program__ + " v" + __version__ + " started. \nConnection...")
+logText("BOT " + __program__ + " v" + __version__ + " started. \nConnection...")
 logStart()
 
 try:

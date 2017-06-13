@@ -140,9 +140,11 @@ def fshutdown():
     mainStream.disconnect()
     cmdStream.disconnect()
     logText("Shuting down...")
-    txt = os.system("pkill -9 -f "+str(os.path.realpath(__file__)))
+    txt = "pkill -9 -f " + str(os.path.realpath(__file__))
     print(txt)
+    os.system("pkill -9 -f "+)
     sys.exit()
+    logText("Impossible to Shut down")
         
 def frestart():
     """

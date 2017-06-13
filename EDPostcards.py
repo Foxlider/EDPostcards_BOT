@@ -23,7 +23,7 @@
 
 #Basic informations 
 __program__ = "EDP Bot"
-__version__ = "1.6d"
+__version__ = "1.7c"
 
 ##Libraries imports
 import datetime
@@ -74,16 +74,21 @@ quote7="I must... Resist... To... QUOTE ! NOOOOOOO ! ",
 quote8='You want some pics ? You love those pics... Take those pics ! ',
 quote9='His work is awesome. Check this out ! ',
 quote10='Wow ! I liked this game but now i really love it ! ',
-quote11='Is that some Elite Dangerous screenshots ? ',
+quote11='Is that some Elite Dangerous screenshots ? Of course it is !',
 quote12="You know you want these screenshots. You want them ! ",
 quote13="\"From space, with love\" -ED_Postcards",
 quote14="Fly safe, CMDRs !",
 quote15="These are incredible ! Check this out !",
 quote16="I don't know what to say. It's just wonderful ! ",
 quote17="This is it. I am in love.",
-quote18="I have one word only in mind : Incredible",
-quote19="I have one word only in mind : Splendid",
+quote18="I have one word only in mind : Incredible.",
+quote19="I have one word only in mind : Splendid.",
 quote20="This game offers some pretty postcards for sure !",
+quote21="I could spend hours of my time looking at this.",
+quote22="Too bad I don't have any eyes to enjoy this.",
+quote23="My core is heating just by looking at these pictures.",
+quote24="I'd love to jump into one of those ships and enjoy the view.",
+quote25="I'll force my developper to log me in his ship.",
 quote50="I am running out of ideas for texts. So... Here, take this.")
 
 #The filter
@@ -148,6 +153,12 @@ def frestart():
     """
         this function is supposed to shutdown then restart the bot
     """
+    logText("Restarting...")
+    shutdown = True
+    loop = False
+    api.update_profile(location="In a debris field")
+    mainStream.disconnect()
+    cmdStream.disconnect()
     os.system("./../EDPostcards.sh")
     #fshutdown()
     #python = sys.executable
@@ -180,6 +191,9 @@ def cmdHandler(cmd, orig=True):
                 logError(error.args[0][0]['code'], error.args[0][0]['message'])
         elif (cmd.startswith('quote ')):
             id = cmd[6:].split(' ')[0]
+            manualStatusHandler(id)
+        elif (cmd.startswith('https://twitter')):
+            id = cmd.split("/")[(len(cmd.split("/"))-1)]
             manualStatusHandler(id)
         elif (cmd.startswith("foo ")):
             text = cmd[4:]

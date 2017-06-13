@@ -23,7 +23,7 @@
 
 #Basic informations 
 __program__ = "EDP Bot"
-__version__ = "1.6c"
+__version__ = "1.6d"
 
 ##Libraries imports
 import datetime
@@ -142,7 +142,7 @@ def fshutdown():
     logText("Shuting down...")
     txt = "pkill -9 -f " + str(os.path.realpath(__file__))
     print(txt)
-    os.system("pkill -9 -f "+)
+    #os.system()
     sys.exit()
     logText("Impossible to Shut down")
         

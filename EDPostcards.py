@@ -186,7 +186,7 @@ def cmdHandler(cmd, orig=True):
             logText(text)
         
         if orig: #If the command was sent through the console, display the message again
-            cmdHandler(input("Command ? : \n>>>")) 
+            #cmdHandler(input("Command ? : \n>>>")) 
             
 def logStart():
     """
@@ -453,4 +453,4 @@ else:
 time.sleep(2)
 
 
-cmdHandler(input("Command ? : \n>>>"))
+#cmdHandler(input("Command ? : \n>>>"))

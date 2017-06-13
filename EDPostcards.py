@@ -185,7 +185,7 @@ def cmdHandler(cmd, orig=True):
             text = cmd[4:]
             logText(text)
         
-        if orig: #If the command was sent through the console, display the message again
+        #if orig: #If the command was sent through the console, display the message again
             #cmdHandler(input("Command ? : \n>>>")) 
             
 def logStart():

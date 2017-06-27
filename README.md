@@ -48,3 +48,9 @@ THE END
 - Handling medias in manual quotes
 - Text corrections
 - Stuff...
+
+## [ Version 1.7 ]
+- Improved quoting
+- More sentences while quoting
+- Fixed restart and shutdown function
+- Stuff...

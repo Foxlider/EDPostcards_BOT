@@ -284,7 +284,7 @@ def manualStatusHandler(id):
     """
     try:
         decoded = api.get_status(id)
-        #dump(decoded)
+        dump(decoded)
         id = decoded.id
         sendertag = decoded.author.screen_name
         try:
@@ -299,7 +299,7 @@ def manualStatusHandler(id):
             logText("Oops ! I slipped in a "+str(error))
             logError(123, str(error))
         qcode, qtext = random.choice(list(quoteText.items()))           #Get one of the quote answers
-        api.update_status(status = qtext+" https://twitter.com/"+sendertag+"/status/"+str(id))
+        #api.update_status(status = qtext+" https://twitter.com/"+sendertag+"/status/"+str(id))
         logText("Manually quoting " + sendertag + "'s tweet " + str(id))
     except tweepy.TweepError as error:
         logError(error.args[0][0]['code'], error.args[0][0]['message'])
@@ -311,6 +311,7 @@ def statusHandler(decoded):
         params : 
             decoded     : The status
     """
+    dump(decoded)
     id = decoded["id"]                                                  #IMPORTANT DATA VARS
     text = decoded["text"]                                              #|
     sender = decoded["user"]["name"]                                    #|
@@ -319,7 +320,7 @@ def statusHandler(decoded):
         #api.send_direct_message(screen_name=sendertag, text="Sending tweets yourself again ?")
         logText("Receiving tweet from myself : " + text)
     elif ("#" + hashtag in text and not text.startswith("RT ") ):      #MAIN : hashtag handling / not an RT
-        statusTreatment(decoded)
+        #statusTreatment(decoded)
         
 def directMessageHandler(decoded):
     """

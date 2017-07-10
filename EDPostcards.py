@@ -321,6 +321,7 @@ def statusHandler(decoded):
         logText("Receiving tweet from myself : " + text)
     elif ("#" + hashtag in text and not text.startswith("RT ") ):      #MAIN : hashtag handling / not an RT
         #statusTreatment(decoded)
+        print("oui")
         
 def directMessageHandler(decoded):
     """

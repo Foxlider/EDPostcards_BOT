@@ -174,13 +174,13 @@ def cmdHandler(cmd, orig=True):
             orig    : True if it comes from the console, False if it comes from direct messages
         calls another cmdHandler if the command is not restart or shutdown
     """
-    if (cmd == "shutdown" or cmd == "Shutdown"): #TODO: Improvements for shutdown
+    if (cmd.lower() == "shutdown"): #TODO: Improvements for shutdown
         fshutdown()
         if not orig:
             logText("Program shutdown command called.")
             sys.exit(0) #BUG: Don't exit but dunno why
             python = sys.executable #FIXME: Using this instead
-    elif cmd == "restart" or cmd =="Restart": #TODO: Improvements for restart
+    elif (cmd.lower() == "restart" or cmd.lower() =="reboot"): #TODO: Improvements for restart
         frestart()
     else:
         if (cmd.startswith("tweet ")):

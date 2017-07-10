@@ -23,7 +23,7 @@
 
 #Basic informations 
 __program__ = "EDP Bot"
-__version__ = "1.7c"
+__version__ = "1.7d"
 
 ##Libraries imports
 import datetime
@@ -265,11 +265,11 @@ def statusTreatment(decoded):
     media = set()
     media_files = set()
     if ("extended_entities" in decoded):                                #if medias were sent
-        media = decoded["extended_entities"]["media"]                   #go get 'em    
+        media = decoded["entities"]["media"]                            #go get 'em    
     logText("Status n°"+str(id)+" by @"+ sender + "\n\""+text+"\" ("+str(len(media)) + " media files)")
     if (len(media)>=1):                                                 #Did we got some medias ?
         for i in media:
-            media_files.add(i["media_url_https"])                           #Add medias to var
+            media_files.add(i["media_url_https"])                       #Add medias to var
         dl(media_files,sender)                                          #Get those medias in your files
         qcode, qtext = random.choice(list(quoteText.items()))           #Get one of the quotenswers
         api.update_status(status = qtext+" https://twitter.com/"+sendertag+"/status/"+str(id))
@@ -288,7 +288,7 @@ def manualStatusHandler(id):
         id = decoded.id
         sendertag = decoded.author.screen_name
         try:
-            media = decoded.extended_entities["media"]
+            media = decoded.entities["media"]
             media_files=set()
             sender = decoded.user.name
             if (len(media)>=1):                                                 #Did we got some medias ?

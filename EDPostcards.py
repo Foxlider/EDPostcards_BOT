@@ -17,6 +17,8 @@
 
 # Commands
 #   shutdown    : To shutdown the BOT (quite obvious)
+#   reboot      : To reboot the BOT
+#   restart     : To reboot the BOT
 #   tweet [txt] : To send a tweet via the bot's console. txt is the message of the tweet.
 
 # THE END

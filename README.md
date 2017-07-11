@@ -19,9 +19,13 @@ But honestly, why would you run this bot if mine is already running ?
 
 # Commands
   - shutdown    : To shutdown the BOT (quite obvious)
-  - reboot      : To reboot the BOT (broken)
+  - reboot      : To reboot the BOT
+  - restart     : To reboot the BOT
   - tweet [txt] : To send a tweet via the bot's console. txt is the message of the tweet.
   - quote [id]  : To quote a specific tweet by sending its ID
+  
+# Launch arguments
+  - `--verbose`   : Enable verbose logging
 
 THE END
 
@@ -53,4 +57,11 @@ THE END
 - Improved quoting
 - More sentences while quoting
 - Fixed restart and shutdown function
+- Stuff...
+
+## [ Version 1.8 ]
+###   [ 1.8c ]
+- Extended tweet handling
+- Text corrections
+- Arguments handling
 - Stuff...

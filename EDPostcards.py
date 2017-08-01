@@ -25,7 +25,7 @@
 
 #Basic informations 
 __program__ = "EDP Bot"
-__version__ = "1.7d"
+__version__ = "1.8d"
 
 ##Libraries imports
 import datetime
@@ -64,7 +64,8 @@ auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 auth.set_access_token(ACCESS_KEY, ACCESS_SECRET)
 api = tweepy.API(auth)
 media_files = set()
-bigBoss = ["Foxlidev","FoxliderAtom"] #Put here your Twitter name to be an admin
+bigBoss = ["Foxlidev","FoxliderAtom","ED_Postcards"] #Put here your Twitter name to be an admin
+
 #Add texts here to increase the BOT's vocabulary and allow it to say more things ! 
 quoteText = dict(quote1='They told me to quote this and I  refused. But those pics are great, so...', 
 quote2='OMG I love those ! This guy is a genius !',
@@ -96,6 +97,11 @@ quote50="I am running out of ideas for texts. So... Here, take this.")
 #The filter
 hashtag = "EDPostcards"
 
+if ("--verbose" in sys.argv):
+    Verbose = True
+else:
+    Verbose = False
+
 global datadir
 datadir = os.path.dirname("./data/")
 if not os.path.exists(datadir):
@@ -123,7 +129,7 @@ def dl(media_files,sender):
     for url in media_files:
         i+=1
         name = str(today.day) + "-" + str(today.month) + "_" + str(today.hour) + "h" + str(today.minute) + "_" + str(i) + '.jpg'
-        logText("downloading media "+str(i)+" : " +url + "to " + folder + name)
+        logText("downloading media "+str(i)+" : " +url + " to " + folder + name)
         try:
             wget.download(url, out = folder+name)
         except Exception as error:
@@ -234,6 +240,24 @@ def logText(text):
     print(log, end='')
     logsFile.close()
 
+def verbose(text):
+    """
+        Function used to log text in a file and printing it in the console.
+        Replacing usual print()
+        params : 
+            text    : text to print
+    """
+    if Verbose :
+        dir = os.path.dirname("./logs/verbose/")
+        if not os.path.exists(dir):
+            os.makedirs(dir)
+        today = datetime.datetime.now()
+        logsFile=open(dir +"/"+ str(today.year) + "-" + str(today.month) + "-" + str(today.day) + ".txt","a")
+        log = "[" + str(today.hour) + ":" + str(today.minute) + ":" + str(today.second) + "] " + text + "\n"
+        logsFile.write(log)
+        print(log, end='')
+        logsFile.close()
+
 def logError(errnum = 0, errtext=""):
     """
         Function used to print errors in a file
@@ -262,12 +286,25 @@ def statusTreatment(decoded):
     text = decoded["text"]                                              #|
     sender = decoded["user"]["name"]                                    #|
     sendertag = decoded["user"]["screen_name"]                          #|
-    #○dump(decoded)
+    #dump(decoded)
     logText(hashtag + " in status text")                               #Write to logs
     media = set()
     media_files = set()
-    if ("extended_entities" in decoded):                                #if medias were sent
-        media = decoded["entities"]["media"]                            #go get 'em    
+    if ("extended_tweet" in decoded):
+        verbose("extended_tweet !")
+        if ("extended_entities" in decoded["extended_tweet"]):                                #if medias were sent
+            verbose("extended_entities in tweet")
+            media = decoded["extended_tweet"]["extended_entities"]["media"]       #go get 'em
+        elif ("media" in decoded["entities"]):
+            verbose("entities in tweet")
+            media = decoded["entities"]["media"]
+    else:
+        if ("extended_entities" in decoded):                                #if medias were sent
+            verbose("extended_entities in tweet")
+            media = decoded["extended_entities"]["media"]                            #go get 'em
+        elif ("media" in decoded["entities"]):
+            verbose("entities in tweet")
+            media = decoded["entities"]["media"]
     logText("Status n°"+str(id)+" by @"+ sender + "\n\""+text+"\" ("+str(len(media)) + " media files)")
     if (len(media)>=1):                                                 #Did we got some medias ?
         for i in media:
@@ -286,23 +323,28 @@ def manualStatusHandler(id):
     """
     try:
         decoded = api.get_status(id)
-        #dump(decoded)
+        dump(decoded)
         id = decoded.id
         sendertag = decoded.author.screen_name
-        try:
-            media = decoded.entities["media"]
-            media_files=set()
-            sender = decoded.user.name
-            if (len(media)>=1):                                                 #Did we got some medias ?
-                for i in media:
-                    media_files.add(i["media_url"])                             #Add medias to var
-                dl(media_files,sender)                                          #Get those medias in your files
-        except Exception as error:
-            logText("Oops ! I slipped in a "+str(error))
-            logError(123, str(error))
-        qcode, qtext = random.choice(list(quoteText.items()))           #Get one of the quote answers
-        api.update_status(status = qtext+" https://twitter.com/"+sendertag+"/status/"+str(id))
-        logText("Manually quoting " + sendertag + "'s tweet " + str(id))
+        if(hasattr(decoded, 'extended_entities')):
+            try:
+                media = decoded.extended_entities["media"]
+                dump(decoded.extended_entities["media"])
+                dump(decoded.entities["media"])
+                media_files=set()
+                sender = decoded.user.name
+                if (len(media)>=1):                                                 #Did we got some medias ?
+                    for i in media:
+                        media_files.add(i["media_url"])                             #Add medias to var
+                    dl(media_files,sender)                                          #Get those medias in your files
+            except Exception as error:
+                logText("Oops ! I slipped in a "+str(error))
+                logError(123, str(error))
+            qcode, qtext = random.choice(list(quoteText.items()))           #Get one of the quote answers
+            api.update_status(status = qtext+" https://twitter.com/"+sendertag+"/status/"+str(id))
+            logText("Manually quoting " + sendertag + "'s tweet " + str(id))
+        else:
+            logText("No media in "+ sendertag + "'s tweet " + str(id))
     except tweepy.TweepError as error:
         logError(error.args[0][0]['code'], error.args[0][0]['message'])
         
@@ -313,15 +355,21 @@ def statusHandler(decoded):
         params : 
             decoded     : The status
     """
-    #dump(decoded)
+    dump(decoded)
     id = decoded["id"]                                                  #IMPORTANT DATA VARS
-    text = decoded["text"]                                              #|
+    if ("extended_tweet" in decoded):
+        verbose("Extended tweet")
+        text = decoded["extended_tweet"]["full_text"]
+    else:
+        verbose("Standard tweet")
+        text = decoded["text"]                                              #|
     sender = decoded["user"]["name"]                                    #|
     sendertag = decoded["user"]["screen_name"]                          #|
+    verbose(text)
     if (sendertag == me.screen_name):                                   #IF BOT sending tweets to itself
         #api.send_direct_message(screen_name=sendertag, text="Sending tweets yourself again ?")
         logText("Receiving tweet from myself : " + text)
-    elif ("#" + hashtag in text and not text.startswith("RT ") ):      #MAIN : hashtag handling / not an RT
+    elif ("#" + lower(hashtag) in lower(text) and not text.startswith("RT ") ):      #MAIN : hashtag handling / not an RT
         statusTreatment(decoded)
         #print("oui")
         
@@ -397,78 +445,82 @@ def dump(obj, nested_level=0, output=sys.stdout):
     """
     spacing = '   '
     if type(obj) == dict:
-        print ( '%s{' % ((nested_level) * spacing))
+        verbose ( '%s{' % ((nested_level) * spacing))
         for k, v in obj.items():
             if hasattr(v, '__iter__'):
-                print(  '%s%s:' % ((nested_level + 1) * spacing, k))
+                verbose(  '%s%s:' % ((nested_level + 1) * spacing, k))
                 dump(v, nested_level + 1, output)
             else:
-                print ( '%s%s: %s' % ((nested_level + 1) * spacing, k, v))
-        print (  '%s}' % (nested_level * spacing))
+                verbose ( '%s%s: %s' % ((nested_level + 1) * spacing, k, v))
+        verbose (  '%s}' % (nested_level * spacing))
     elif type(obj) == list:
-        print (  '%s[' % ((nested_level) * spacing))
+        verbose (  '%s[' % ((nested_level) * spacing))
         for v in obj:
             if hasattr(v, '__iter__'):
                 dump(v, nested_level + 1, output)
             else:
-                print (  '%s%s' % ((nested_level + 1) * spacing, v))
-        print ('%s]' % ((nested_level) * spacing))
+                verbose (  '%s%s' % ((nested_level + 1) * spacing, v))
+        verbose ('%s]' % ((nested_level) * spacing))
     else:
-        print(  '%s%s' % (nested_level * spacing, obj))
+        verbose(  '%s%s' % (nested_level * spacing, obj))
 
 ## The bot itself  
 
 logText("BOT " + __program__ + " v" + __version__ + " started. \nConnection...")
 logStart()
-
+verbose("BOT " + __program__ + " v" + __version__ + " started. \nVerbose activated")
 try:
-    api.update_profile(location="Sol")
-    me = api.me()
-    logText("Logged in as @"+ me.screen_name +" !")
-    #print (vars(me))
-except tweepy.TweepError:
-    logText ("Could not authenticate you. \nExiting the program.")
-    logError(420, str(tweepy.TweepError)+" Could not authenticate you.")
-    exit()
-logText("____[ INFORMATIONS ]____")
-logText("@"+me.screen_name)
-logText(str(me.followers_count)+" followers : ")
-for follower in me.followers():
-   logText(" -"+follower.screen_name)
-   if (not follower.following):
-        try:
-            follower.follow()
-        except tweepy.TweepError:
-            logError(421, str(tweepy.TweepError)+" Follow error.")
+        
+    try:
+        api.update_profile(location="Sol")
+        me = api.me()
+        logText("Logged in as @"+ me.screen_name +" !")
+        #print (vars(me))
+    except tweepy.TweepError:
+        logText ("Could not authenticate you. \nExiting the program.")
+        logError(420, str(tweepy.TweepError)+" Could not authenticate you.")
+        exit()
+    logText("____[ INFORMATIONS ]____")
+    logText("@"+me.screen_name)
+    logText(str(me.followers_count)+" followers : ")
+    for follower in me.followers():
+       logText(" -"+follower.screen_name)
+       if (not follower.following):
+            try:
+                follower.follow()
+            except tweepy.TweepError:
+                logError(421, str(tweepy.TweepError)+" Follow error.")
 
-try:
-    if mainStream.running or cmdStream:
-        logText ("Stream already running.")
-        mainStream.disconnect()
-        cmdStream.disconnect()
+    try:
+        if mainStream.running or cmdStream:
+            logText ("Stream already running.")
+            mainStream.disconnect()
+            cmdStream.disconnect()
+        else:
+            logText("Stream not running. Starting Stream...")
+    except:
+        logText("Stream not Detected. Starting Stream...")
+
+    mainStream = tweepy.Stream(auth = api.auth, listener=mainStreamListener())
+    cmdStream = tweepy.Stream(auth = api.auth, listener=cmdStreamListener())
+
+    mainStream.filter(track=[hashtag], async=True)
+    cmdStream.userstream(async=True)
+    shutdown = False
+
+    if mainStream.running:
+        logText ("MainStream running.")
     else:
-        logText("Stream not running. Starting Stream...")
-except:
-    logText("Stream not Detected. Starting Stream...")
-
-mainStream = tweepy.Stream(auth = api.auth, listener=mainStreamListener())
-cmdStream = tweepy.Stream(auth = api.auth, listener=cmdStreamListener())
-
-mainStream.filter(track=[hashtag], async=True)
-cmdStream.userstream(async=True)
-shutdown = False
-
-if mainStream.running:
-    logText ("MainStream running.")
-else:
-    logText("MainStream startup failed")
-    fshutdown()
-if cmdStream.running:
-    logText ("CMDStream running.")
-else:
-    logText("CMDStream startup failed")
-    fshutdown()
-time.sleep(2)
+        logText("MainStream startup failed")
+        fshutdown()
+    if cmdStream.running:
+        logText ("CMDStream running.")
+    else:
+        logText("CMDStream startup failed")
+        fshutdown()
+    time.sleep(2)
 
 
-#cmdHandler(input("Command ? : \n>>>"))
+    #cmdHandler(input("Command ? : \n>>>"))
+except ReadTimeoutError :
+    frestart()

@@ -48,6 +48,12 @@ import os
 #TODO:   every text in logs
 
 ##Variables setup
+if ("--verbose" in sys.argv): #Sys Args
+    Verbose = True
+else:
+    Verbose = False
+    
+
 try:
     keysFile=open("data/keyFile.txt","r")
 except Exception as error:
@@ -74,7 +80,8 @@ def verbose(text):
         logsFile.write(log)
         print(log, end='')
         logsFile.close()
-verbose(keys)
+        
+
 CONSUMER_KEY = keys[0].rstrip()
 CONSUMER_SECRET = keys[1].rstrip()
 ACCESS_KEY = keys[2].rstrip()
@@ -116,10 +123,7 @@ quote50="I am running out of ideas for texts. So... Here, take this.")
 #The filter
 hashtag = "EDPostcards"
 
-if ("--verbose" in sys.argv):
-    Verbose = True
-else:
-    Verbose = False
+
 
 global datadir
 datadir = os.path.dirname("./data/")

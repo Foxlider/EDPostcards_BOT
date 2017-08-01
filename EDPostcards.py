@@ -374,7 +374,7 @@ def statusHandler(decoded):
     if (sendertag == me.screen_name):                                   #IF BOT sending tweets to itself
         #api.send_direct_message(screen_name=sendertag, text="Sending tweets yourself again ?")
         logText("Receiving tweet from myself : " + text)
-    elif ("#" + lower(hashtag) in lower(text) and not text.startswith("RT ") ):      #MAIN : hashtag handling / not an RT
+    elif ("#" + hashtag.lower() in text.lower() and not text.startswith("RT ") ):      #MAIN : hashtag handling / not an RT
         statusTreatment(decoded)
         #print("oui")
         

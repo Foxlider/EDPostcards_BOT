@@ -3,6 +3,7 @@
 data/
 dl/
 logs/
+keyfile.txt
 
 
 # Byte-compiled / optimized / DLL files

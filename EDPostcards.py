@@ -49,7 +49,7 @@ import os
 
 ##Variables setup
 try:
-    keysFile=open("keyFile.txt","r")
+    keysFile=open("/keyFile.txt","r")
 except Exception as error:
     print(str(error) + "\nkeyFile doesn't exists. What have you done ? Nooooo ! *couic*")
     quit();

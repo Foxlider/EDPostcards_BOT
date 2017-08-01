@@ -49,13 +49,32 @@ import os
 
 ##Variables setup
 try:
-    keysFile=open("/data/keyFile.txt","r")
+    keysFile=open("data/keyFile.txt","r")
 except Exception as error:
     print(str(error) + "\nkeyFile doesn't exists. What have you done ? Nooooo ! *couic*")
     quit();
 keys=keysFile.readlines()
 keysFile.close()
 
+
+def verbose(text):
+    """
+        Function used to log text in a file and printing it in the console.
+        Replacing usual print()
+        params : 
+            text    : text to print
+    """
+    if Verbose :
+        dir = os.path.dirname("./logs/verbose/")
+        if not os.path.exists(dir):
+            os.makedirs(dir)
+        today = datetime.datetime.now()
+        logsFile=open(dir +"/"+ str(today.year) + "-" + str(today.month) + "-" + str(today.day) + ".txt","a")
+        log = "[" + str(today.hour) + ":" + str(today.minute) + ":" + str(today.second) + "] " + text + "\n"
+        logsFile.write(log)
+        print(log, end='')
+        logsFile.close()
+verbose(keys)
 CONSUMER_KEY = keys[0].rstrip()
 CONSUMER_SECRET = keys[1].rstrip()
 ACCESS_KEY = keys[2].rstrip()
@@ -239,24 +258,6 @@ def logText(text):
     logsFile.write(log)
     print(log, end='')
     logsFile.close()
-
-def verbose(text):
-    """
-        Function used to log text in a file and printing it in the console.
-        Replacing usual print()
-        params : 
-            text    : text to print
-    """
-    if Verbose :
-        dir = os.path.dirname("./logs/verbose/")
-        if not os.path.exists(dir):
-            os.makedirs(dir)
-        today = datetime.datetime.now()
-        logsFile=open(dir +"/"+ str(today.year) + "-" + str(today.month) + "-" + str(today.day) + ".txt","a")
-        log = "[" + str(today.hour) + ":" + str(today.minute) + ":" + str(today.second) + "] " + text + "\n"
-        logsFile.write(log)
-        print(log, end='')
-        logsFile.close()
 
 def logError(errnum = 0, errtext=""):
     """

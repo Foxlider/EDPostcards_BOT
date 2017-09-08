@@ -529,3 +529,9 @@ try:
     #cmdHandler(input("Command ? : \n>>>"))
 except ReadTimeoutError :
     frestart()
+except Error as error :
+    logError(990, str(error))
+    frestart()
+except tweepy.TweepError :
+    logError(880, str(error))
+    frestart()

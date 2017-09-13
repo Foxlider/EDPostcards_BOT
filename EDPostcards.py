@@ -418,6 +418,7 @@ class mainStreamListener(tweepy.StreamListener): #MAIN STREAM TO HANDLE HASHTAG 
 
     def on_timeout(self):
         logError(105, 'Timeout...')
+        frestart()
         return True
         
 class cmdStreamListener(tweepy.StreamListener): #THIS ONE IS USED FOR COMMANDS HANDLING ONLY
@@ -437,6 +438,7 @@ class cmdStreamListener(tweepy.StreamListener): #THIS ONE IS USED FOR COMMANDS H
             return True
     def on_timeout(self):
         logError(105, 'Timeout...')
+        frestart()
         return True
         
 def dump(obj, nested_level=0, output=sys.stdout):
@@ -529,7 +531,7 @@ try:
     #cmdHandler(input("Command ? : \n>>>"))
 except ReadTimeoutError :
     frestart()
-except Error as error :
+except Exception as error :
     logError(990, str(error))
     frestart()
 except tweepy.TweepError :

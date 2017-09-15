@@ -279,6 +279,7 @@ def logError(errnum = 0, errtext=""):
     logsFile.write(log)
     print(log, end='')
     logsFile.close()
+    frestart() #Here till I find a way to prevent disconnects
 
 def statusTreatment(decoded):
     """

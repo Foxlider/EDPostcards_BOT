@@ -25,7 +25,7 @@
 
 #Basic informations 
 __program__ = "EDP Bot"
-__version__ = "1.8d"
+__version__ = "1.8e"
 
 ##Libraries imports
 import datetime
@@ -413,8 +413,10 @@ class mainStreamListener(tweepy.StreamListener): #MAIN STREAM TO HANDLE HASHTAG 
         logText ("Error Code: " + str(status_code))
         logError(status_code, "Twitter API error. Refer to dev.twitter.com for more informations")
         if status_code == 420:
+            frestart()
             return False
         else:
+            frestart()
             return True
 
     def on_timeout(self):
@@ -434,8 +436,10 @@ class cmdStreamListener(tweepy.StreamListener): #THIS ONE IS USED FOR COMMANDS H
         logText ("Error Code: " + str(status_code))
         logError(status_code, "Twitter API error. Refer to dev.twitter.com for more informations")
         if status_code == 420:
+            frestart()
             return False
         else:
+            frestart()
             return True
     def on_timeout(self):
         logError(105, 'Timeout...')
@@ -510,6 +514,7 @@ try:
         logText("Stream not Detected. Starting Stream...")
 
     mainStream = tweepy.Stream(auth = api.auth, listener=mainStreamListener())
+    time.sleep(3) #So twitter calms down a little
     cmdStream = tweepy.Stream(auth = api.auth, listener=cmdStreamListener())
 
     mainStream.filter(track=[hashtag], async=True)

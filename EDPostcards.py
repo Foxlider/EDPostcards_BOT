@@ -541,7 +541,7 @@ class cmdStreamListener(tweepy.StreamListener): #THIS ONE IS USED FOR COMMANDS H
         :param tweepy.StreamListener:
     """
     def on_data(self, status):
-        logText("I heard something...")
+        #logText("I heard something...")
         decoded = json.loads(status)
         dataHandler(decoded)
     def on_error(self, status_code):

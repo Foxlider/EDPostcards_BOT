@@ -1,9 +1,13 @@
 ##INFORMATIONS
-#Hello people ! I'm Foxlider.
-#About a year ago (about 2016) I created the #EDPostcards on Twitter.
-#It started to gain quite a reputation.
-#But now I want people to be able to receive easily what people tweet on the hashtag whenever somebody tweet.
-# And this lil BOT is born. THE END
+#
+# Hello people ! I'm Foxlider.
+#
+# About a year ago (about 2016) I created the #EDPostcards on Twitter.
+# It started to gain quite a reputation.
+# But now I want people to be able to receive easily what people tweet on the hashtag whenever somebody tweet.
+# 
+# And this lil BOT is born. 
+# THE END
 #
 
 # Installation :

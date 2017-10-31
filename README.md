@@ -54,3 +54,13 @@ THE END
 - More sentences while quoting
 - Fixed restart and shutdown function
 - Stuff...
+
+## [ Version 2.1 ]
+###   [ 2.1a ]
+- Improved quoting
+- More sentences while quoting
+- FTP system added
+- Commands improved
+- New testing system
+- Streaming improved
+- Stuff...

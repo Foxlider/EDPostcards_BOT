@@ -313,9 +313,9 @@ def IsStatus(status):
         :param status:
     """
     if "in_reply_to_status_id" in status and not "event" in status:
-        logText("Is Status")
+        #logText("Is Status")
         return True
-    logText("Is Not Status")
+    #logText("Is Not Status")
     return False
 
 def IsRetweet(status):

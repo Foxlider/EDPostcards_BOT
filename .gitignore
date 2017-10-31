@@ -3,7 +3,8 @@
 data/
 dl/
 logs/
-keyfile.txt
+keyFile.txt
+ftpFile.txt
 
 
 # Byte-compiled / optimized / DLL files

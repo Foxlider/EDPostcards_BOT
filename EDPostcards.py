@@ -444,7 +444,7 @@ def dataHandler(data):
     if not "friends" in data:
         if IsStatus(data) and not IsRetweet(data) and not HaveSent(me, data) and (IsMentionned(me, data) or HaveHashTag(data, Hashtag)): #and HaveImages(data)
             handleImageStatus(data)
-        if IsDirectMessage(data) and not HaveSent(me, data):
+        elif IsDirectMessage(data) and not HaveSent(me, data):
             handleCommand(data)
 
 def handleImageStatus(status):
@@ -452,7 +452,12 @@ def handleImageStatus(status):
     Function to handle a status
         :param status:
     """
-    logText("This is a Status !")
+    if HaveHashTag(status, Hashtag):
+        logText("Hashtag Status !")
+    elif IsMentionned(me, status):
+        logText("Mentionned Status !")
+    else:
+        logText("WAT")
     if HaveImages(status):
         quoteStatus(status["id"])
 
@@ -522,6 +527,7 @@ class mainStreamListener(tweepy.StreamListener): #MAIN STREAM TO HANDLE HASHTAG 
     """
     def on_data(self, status):
         #dump(self)
+        logText("mainStream called")
         decoded = json.loads(status)
         dataHandler(decoded)
 
@@ -546,6 +552,7 @@ class cmdStreamListener(tweepy.StreamListener): #THIS ONE IS USED FOR COMMANDS H
     """
     def on_data(self, status):
         #logText("I heard something...")
+        logText("cmdStream called")
         decoded = json.loads(status)
         dataHandler(decoded)
     def on_error(self, status_code):

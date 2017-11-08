@@ -436,15 +436,15 @@ def getStatusText(status):
     #verbose("Standard tweet")
     return status["text"]
 
-def dataHandler(data):
+def dataHandler(data, main):
     """
     Function to handle data like tweets or direct messages
         :param data:
     """
     if not "friends" in data:
-        if IsStatus(data) and not IsRetweet(data) and not HaveSent(me, data) and (IsMentionned(me, data) or HaveHashTag(data, Hashtag)): #and HaveImages(data)
+        if IsStatus(data) and not IsRetweet(data) and not HaveSent(me, data) and ((not main and IsMentionned(me, data)) or (main and HaveHashTag(data, Hashtag))):
             handleImageStatus(data)
-        elif IsDirectMessage(data) and not HaveSent(me, data):
+        if IsDirectMessage(data) and not HaveSent(me, data):
             handleCommand(data)
 
 def handleImageStatus(status):
@@ -529,7 +529,7 @@ class mainStreamListener(tweepy.StreamListener): #MAIN STREAM TO HANDLE HASHTAG 
         #dump(self)
         logText("mainStream called")
         decoded = json.loads(status)
-        dataHandler(decoded)
+        dataHandler(decoded, True)
 
     def on_error(self, status_code):
         logText("Error Code: " + str(status_code))
@@ -554,7 +554,7 @@ class cmdStreamListener(tweepy.StreamListener): #THIS ONE IS USED FOR COMMANDS H
         #logText("I heard something...")
         logText("cmdStream called")
         decoded = json.loads(status)
-        dataHandler(decoded)
+        dataHandler(decoded, False)
     def on_error(self, status_code):
         logText("Error Code: " + str(status_code))
         logError(status_code, "Twitter API error. Refer to dev.twitter.com for more informations")
@@ -610,26 +610,26 @@ try:    #Main loop
     try:                                                #Starting streams
         if mainStream.running or cmdStream:
             logText("Stream already running.")
-            #mainStream.disconnect()
+            mainStream.disconnect()
             cmdStream.disconnect()
         else:
             logText("Stream not running. Starting Stream...")
     except:
         logText("Stream not Detected. Starting Stream...")
 
-    #mainStream = tweepy.Stream(auth=api.auth, listener=mainStreamListener())
+    mainStream = tweepy.Stream(auth=api.auth, listener=mainStreamListener())
     time.sleep(3) #So twitter calms down a little
     cmdStream = tweepy.Stream(auth=api.auth, listener=cmdStreamListener())
 
-    #mainStream.filter(track=[Hashtag], async=True)
+    mainStream.filter(track=[Hashtag], async=True)
     cmdStream.userstream(async=True)
     shutdown = False
 
-    #if mainStream.running:
-    #    logText("MainStream running.")
-    #else:
-    #    logText("MainStream startup failed")
-    #    fshutdown()
+    if mainStream.running:
+        logText("MainStream running.")
+    else:
+        logText("MainStream startup failed")
+        fshutdown()
     if cmdStream.running:
         logText("CMDStream running.")
     else:

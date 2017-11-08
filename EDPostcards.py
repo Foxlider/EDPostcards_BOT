@@ -28,7 +28,7 @@
 
 #Basic informations
 __program__ = "EDPostcards Bot"
-__version__ = "2.1a"
+__version__ = "2.1b"
 
 ##Libraries imports
 import datetime
@@ -526,8 +526,6 @@ class mainStreamListener(tweepy.StreamListener): #MAIN STREAM TO HANDLE HASHTAG 
         :param tweepy.StreamListener:
     """
     def on_data(self, status):
-        #dump(self)
-        logText("mainStream called")
         decoded = json.loads(status)
         dataHandler(decoded, True)
 
@@ -551,8 +549,6 @@ class cmdStreamListener(tweepy.StreamListener): #THIS ONE IS USED FOR COMMANDS H
         :param tweepy.StreamListener:
     """
     def on_data(self, status):
-        #logText("I heard something...")
-        logText("cmdStream called")
         decoded = json.loads(status)
         dataHandler(decoded, False)
     def on_error(self, status_code):

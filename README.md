@@ -48,7 +48,6 @@ THE END
 - Handling medias in manual quotes
 - Text corrections
 - Stuff...
-
 ## [ Version 1.7 ]
 - Improved quoting
 - More sentences while quoting
@@ -63,4 +62,7 @@ THE END
 - Commands improved
 - New testing system
 - Streaming improved
+- Stuff...
+###   [ 2.1b ]
+- Avoided the double quote when having only the Hashtag
 - Stuff...

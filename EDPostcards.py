@@ -610,26 +610,26 @@ try:    #Main loop
     try:                                                #Starting streams
         if mainStream.running or cmdStream:
             logText("Stream already running.")
-            mainStream.disconnect()
+            #mainStream.disconnect()
             cmdStream.disconnect()
         else:
             logText("Stream not running. Starting Stream...")
     except:
         logText("Stream not Detected. Starting Stream...")
 
-    mainStream = tweepy.Stream(auth=api.auth, listener=mainStreamListener())
+    #mainStream = tweepy.Stream(auth=api.auth, listener=mainStreamListener())
     time.sleep(3) #So twitter calms down a little
     cmdStream = tweepy.Stream(auth=api.auth, listener=cmdStreamListener())
 
-    mainStream.filter(track=[Hashtag], async=True)
+    #mainStream.filter(track=[Hashtag], async=True)
     cmdStream.userstream(async=True)
     shutdown = False
 
-    if mainStream.running:
-        logText("MainStream running.")
-    else:
-        logText("MainStream startup failed")
-        fshutdown()
+    #if mainStream.running:
+    #    logText("MainStream running.")
+    #else:
+    #    logText("MainStream startup failed")
+    #    fshutdown()
     if cmdStream.running:
         logText("CMDStream running.")
     else:

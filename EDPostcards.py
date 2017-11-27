@@ -593,7 +593,8 @@ try:    #Main loop
                 logText(" -"+follower.screen_name)
                 follower.follow()
             except tweepy.TweepError:
-                logError(421, str(tweepy.TweepError)+" Follow error.")
+                pass #Cuz I'm somehow getting errors here
+                #logError(421, str(tweepy.TweepError)+" Follow error.")
     #for follower in api.friends_ids(me.id):
     #   if (not api.lookup_friendships(me.id)):
     #        try:

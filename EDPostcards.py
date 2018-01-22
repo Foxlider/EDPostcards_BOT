@@ -510,7 +510,7 @@ def quoteStatus(statusId):
         elif hasattr(decoded.entities, "media"):
             media = decoded.entities["media"]
 
-    logText("Status n°"+str(statusId)+" by @"+ sender + "\n\""+text+"\" ("+str(len(media)) + " media files)")
+    logText("Status n"+str(statusId)+" by @"+ sender + "\n\""+text+"\" ("+str(len(media)) + " media files)")
     if len(media) >= 1:                                                 #Did we got some medias ?
         for i in media:
             media_files.add(i["media_url_https"])                       #Add medias to var

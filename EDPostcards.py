@@ -591,7 +591,7 @@ try:    #Main loop
         if not follower.following:
             try:
                 logText(" -"+follower.screen_name)
-                follower.follow()
+                #follower.follow()
             except tweepy.TweepError:
                 pass #Cuz I'm somehow getting errors here
                 #logError(421, str(tweepy.TweepError)+" Follow error.")

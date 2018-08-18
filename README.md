@@ -66,3 +66,8 @@ THE END
 ###   [ 2.1b ]
 - Avoided the double quote when having only the Hashtag
 - Stuff...
+
+## [ Version 2.2 ]
+###   [ 2.2b ]
+- Handling Config files 
+- Handling Best Users and commands

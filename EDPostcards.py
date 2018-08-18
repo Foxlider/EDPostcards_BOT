@@ -28,28 +28,28 @@
 
 #Basic informations
 __program__ = "EDPostcards Bot"
-__version__ = "2.1b"
+__version__ = "2.2b"
 
 ##Libraries imports
 import datetime
 import sys
+import configparser
 try:
     assert sys.version_info >= (3, 4)
     import tweepy
     import wget
     import json
-    import ftplib
 except ImportError as error:
-    print(__program__+"needs tweepy, wget, ftplib and json to work properly. Please install them using pip install <module>. \n" + str(error))
+    print(f"{__program__} needs tweepy, wget, ftplib and json to work properly. Please install them using pip install <module>. \n{error}")
     sys.exit()
 except AssertionError:
-    print(__program__+'needs python 3.4 or greater to work properly. Please see the installation guide for your Operating System.')
+    print(f"{__program__} needs python 3.4 or greater to work properly. Please see the installation guide for your Operating System.")
     sys.exit()
 import time
 import random
 import os
 
-
+filepath = os.path.dirname(os.path.realpath(__file__))
 
 
 ##Variables setup
@@ -58,45 +58,50 @@ if "--verbose" in sys.argv: #Sys Args
 else:
     Verbose = False
 
-#Twitter AUTH
+#Config file
+config = configparser.ConfigParser()
+config.optionxform = str
 try:
-    keysFile = open("data/keyFile.txt", "r")
-except IOError  as error:
-    print(str(error) + "\nkeyFile doesn't exists. What have you done ? Nooooo ! *couic*")
+    config.read(f'{filepath}/data/config.cfg')
+    bestUsers = config['BestUsers']
+except Exception as error:
+    print(f" -- ERROR : Config file not detected. Have you launched the installer first ?\n{error}")
     quit()
-keys = keysFile.readlines()
-keysFile.close()
-CONSUMER_KEY = keys[0].rstrip()
-CONSUMER_SECRET = keys[1].rstrip()
-ACCESS_KEY = keys[2].rstrip()
-ACCESS_SECRET = keys[3].rstrip()
+
+
+
+#Twitter AUTH
+CONSUMER_KEY = config["Keys"]["CONSUMER_KEY"]
+CONSUMER_SECRET = config["Keys"]["CONSUMER_SECRET"]
+ACCESS_KEY = config["Keys"]["ACCESS_KEY"]
+ACCESS_SECRET = config["Keys"]["ACCESS_SECRET"]
 auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 auth.set_access_token(ACCESS_KEY, ACCESS_SECRET)
 api = tweepy.API(auth)
 
 
 #FTP AUTH
-try:
-    keysFile = open("data/ftpFile.txt", "r")
-except IOError  as error:
-    print(str(error) + "\nkeyFile doesn't exists. What have you done ? Nooooo ! *couic*")
-    quit()
-keys = keysFile.readlines()
-keysFile.close()
-ADDR = keys[0].rstrip()
-IDENT = keys[1].rstrip()
-PWD = keys[2].rstrip()
+#try:
+#    keysFile = open("data/ftpFile.txt", "r")
+#except IOError  as error:
+#    print(f"{error}\nkeyFile doesn't exists. What have you done ? Nooooo ! *couic*")
+#    quit()
+#keys = keysFile.readlines()
+#keysFile.close()
+#ADDR = keys[0].rstrip()
+#IDENT = keys[1].rstrip()
+#PWD = keys[2].rstrip()
 
 bigBoss = ["Foxlidev", "FoxliderAtom", "ED_Postcards"] #Put here your Twitter name to be an admin
 
 #Add texts here to increase the BOT's vocabulary and allow it to say more things !
-quoteText = dict(quote1='They told me to quote this and I  refused. But those pics are great, so...',
-                 quote2='OMG I love those ! This guy is a genius !',
+quoteText = dict(quote1='Oh man ! I neede to quote this pictures ! ',
+                 quote2='I love those ! This guy is a genius !',
                  quote3='My program is telling me that this stuff is awesome and that I must quote it.',
                  quote4='Oh my ! You really should watch this ! I am clearly not overreacting ! ',
-                 quote5="This images are splendid. I'm happy to share them with you.",
+                 quote5="I'm happy to share these images with you.",
                  quote6="I may be a robot, but I know how to appreciate real ART !",
-                 quote7="I must... Resist... To... QUOTE ! NOOOOOOO ! ",
+                 quote7="Here you go ! Fresh pictures out of my drives ! ",
                  quote8='You want some pics ? You love those pics... Take those pics ! ',
                  quote9='His work is awesome. Check this out ! ',
                  quote10='Wow ! I liked this game but now i really love it ! ',
@@ -111,22 +116,44 @@ quoteText = dict(quote1='They told me to quote this and I  refused. But those pi
                  quote19="I have one word only in mind : Splendid.",
                  quote20="This game offers some pretty postcards for sure !",
                  quote21="I could spend hours of my time looking at this.",
-                 quote22="Too bad I don't have any eyes to enjoy this.",
+                 quote22="Too bad I don't have any eyes to enjoy this as much as you can.",
                  quote23="My core is heating just by looking at these pictures.",
                  quote24="I'd love to jump into one of those ships and enjoy the view.",
                  quote25="I'll force my developper to log me in his ship.",
-                 quote50="I am running out of ideas for texts. So... Here, take this.")
+                 quote26="When i received these images, my cycles per second just stopped for a second !",
+                 quote27="Whoah ! My core temp just reached sky high !",
+                 quote28="Oops ! My feeling core just overheated !",
+                 quote29="After many tests by my AI, I can affirm that this is awesome.",
+                 quote30="Interesting things for sure",
+                 quote31="Pictures ! Pictures everywhere !",
+                 quote32="Here you go ! Enjoy !",
+                 quote33="And make sure to follow the author !",
+                 quote34="I dare you to make a better one ! ",
+                 quote35=" -- PRIMARY CORE ERROR : TOO AMAZING TO PROCESS --",
+                 quote36=" -- DEBUG MESSAGE : awesomeness value caused critical memory overflow --",
+                 quote37=" -- DEBUG MESSAGE : imageQUality value is too big for double data type --",
+                 quote38=" -- DEBUG MESSAGE : fImageTreatment returned error message : \"Too awesome\" --",
+                 quote39=" -- Core overheated : Images are too much to handle --",
+                 quote50="I am running out of ideas for texts. But here you go ! ")
 
+
+superQuote = dict(
+    quote1 = "Hey ! More pictures from {} ! ",
+    quote2 = "{} ! One of my favorites ! ",
+    quote3 = "Check out @{} ! His work is absolutely fantastic ! ",
+    quote4 = " -- VALUE feelingsFor{} IS OVER AVAILABLE CAPACITY",
+    quote5 = "You can feel special, {}. You're one of my favorites !"
+)
 #The filter
 Hashtag = "EDPostcards"
 
 
 
-datadir = os.path.dirname("./data/")
+datadir = os.path.dirname(f"{filepath}/data/")
 if not os.path.exists(datadir):
     os.makedirs(datadir)
-if not os.path.exists("./dl/"):
-    os.makedirs("./dl")
+if not os.path.exists(f"{filepath}/dl/"):
+    os.makedirs(f"{filepath}/dl")
 
 
 ##  MAIN FUNCTIONS
@@ -138,7 +165,7 @@ def verbose(text):
             text    : text to print
     """
     if Verbose:
-        fold = os.path.dirname("./logs/verbose/")
+        fold = os.path.dirname(f"{filepath}/logs/verbose/")
         if not os.path.exists(fold):
             os.makedirs(fold)
         today = datetime.datetime.now()
@@ -152,12 +179,12 @@ def logStart():
     """
         Function used to log in a file at startup
     """
-    fold = os.path.dirname("./logs/")
+    fold = os.path.dirname(f"{filepath}/logs/")
     if not os.path.exists(fold):
         os.makedirs(fold)
     today = datetime.datetime.now()
-    logsFile = open("./logs/startup.txt", "a")
-    log = "[" + str(today) + "] : Bot " + __program__ + " v" + __version__ + " logged in\n"
+    logsFile = open(f"{filepath}/logs/startup.txt", "a")
+    log = f"[{today}] : Bot {__program__} v{__version__} logged in\n"
     logsFile.write(log)
     print(log, end='')
 
@@ -168,12 +195,12 @@ def logText(text):
         params :
             text    : text to print
     """
-    fold = os.path.dirname("./logs/console/")
+    fold = os.path.dirname(f"{filepath}/logs/console/")
     if not os.path.exists(fold):
         os.makedirs(fold)
     today = datetime.datetime.now()
-    logsFile = open(fold +"/"+ str(today.year) + "-" + str(today.month) + "-" + str(today.day) + ".txt", "a")
-    log = "[" + str(today.hour) + ":" + str(today.minute) + ":" + str(today.second) + "] " + text + "\n"
+    logsFile = open(f"{fold}/{today.year}-{today.month}-{today.day}.txt", "a")
+    log = f"[{today.hour}:{today.minute}:{today.second}] {text} \n"
     logsFile.write(log)
     print(log, end='')
     logsFile.close()
@@ -185,12 +212,12 @@ def logError(errnum=0, errtext=""):
             errnum      : code of the error between 100 and 999
             errtext     : details of the error
     """
-    fold = os.path.dirname("./logs/errorLogs/")
+    fold = os.path.dirname(f"{filepath}/logs/errorLogs/")
     if not os.path.exists(fold):
         os.makedirs(fold)
     today = datetime.datetime.now()
-    logsFile = open(fold +"/"+ str(today.year) + "-" + str(today.month) + "-" + str(today.day) + ".txt", "a")
-    log = "[" + str(today.hour) + ":" + str(today.minute) + ":" + str(today.second) + "] 0x0" + str(errnum) + " : " + errtext + "\n"
+    logsFile = open(f"{fold}/{today.year}-{today.month}-{today.day}.txt", "a")
+    log = f"[{today.hour}:{today.minute}:{today.second}] 0x0{errnum} : {errtext}\n"
     logsFile.write(log)
     print(log, end='')
     logsFile.close()
@@ -235,7 +262,7 @@ def dl(media_files, sender):
         return a list of the files urls
     """
     i = 0
-    folder = "dl/"+sender+"/"
+    folder = f"{filepath}/dl/{sender}/"
     if not os.path.exists(folder):
         os.makedirs(folder)
     today = datetime.datetime.now()
@@ -243,46 +270,48 @@ def dl(media_files, sender):
     dl_files = set()
     for url in media_files:
         i += 1
-        name = str(today.day) + "-" + str(today.month) + "_" + str(today.hour) + "h" + str(today.minute) + "_" + str(i) + '.jpg'
-        logText("downloading media "+str(i)+" : " +url + " to " + folder + name)
+        name = f"{today.day}-{today.month}_{today.hour}h{today.minute}_{i}.jpg"
+        logText(f"\n - Downloading media {i} : {url} to {folder}{name}")
         try:
             wget.download(url, out=folder+name)
             dl_files.add(name)
         except Exception as error:
             logText(str(error)+"\nUnable to download file. Cancelling.")
             logError(156, str(error)+"\nUnable to download file.")
+            return False
         except:
             logText("Oops I fucked up... You didn't wanted this anyway.")
             logError(157, "Nomething bad happened...")
+            return False
     media_files = set()
     return dl_files, folder
 
-def ftpSend(dlFiles, fold):
-    """
-        This function is used to send filed to the ftp server
-        params :
-            dlFiles : List of files to send
-            fold    : Folder
-    """
-    try:
-        session = ftplib.FTP(ADDR, IDENT, PWD)
-        session.cwd('/dev/dls/wp-content/uploads/EDPostcards')
-        #print('\n    =EDPostcards Folder')
-        #session.retrlines('LIST')
-        #print(str(session.nlst()) + '\n' + str(fold[3:-1]))
-        if fold[3:-1] not in session.nlst():
-            print('New user detected. Creating user folder')
-            session.mkd(fold[3:])
-        session.cwd(fold[3:])
-        for fName in dlFiles:
-            #fName = fold.split('/')[-1]
-            openFile = open(fold+fName, 'rb')
-            code = session.storbinary('STOR ' + fName, openFile)
-            print('File ' + fName + ' sent to ' + fold[3:] + '\n' + str(code))
-            openFile.close()
-        session.quit()
-    except Exception as error:
-        logText(str(error))
+#def ftpSend(dlFiles, fold):
+#    """
+#        This function is used to send filed to the ftp server
+#        params :
+#            dlFiles : List of files to send
+#            fold    : Folder
+#    """
+#    try:
+#        session = ftplib.FTP(ADDR, IDENT, PWD)
+#        session.cwd('/dev/dls/wp-content/uploads/EDPostcards')
+#        #print('\n    =EDPostcards Folder')
+#        #session.retrlines('LIST')
+#        #print(str(session.nlst()) + '\n' + str(fold[3:-1]))
+#        if fold[3:-1] not in session.nlst():
+#            print('New user detected. Creating user folder')
+#            session.mkd(fold[3:])
+#        session.cwd(fold[3:])
+#        for fName in dlFiles:
+#            #fName = fold.split('/')[-1]
+#            openFile = open(fold+fName, 'rb')
+#            code = session.storbinary('STOR ' + fName, openFile)
+#            print(f"File {fName} sent to {fold[3:]} \n{code}")
+#            openFile.close()
+#        session.quit()
+#    except Exception as error:
+#        logText(str(error))
 
 def fshutdown():
     """
@@ -332,6 +361,15 @@ def IsRetweet(status):
             #logText("Is RT")
             return True
     #logText("Is Not RT")
+    return False
+
+def IsReply(status):
+    """
+    Function to test if the given object is a reply
+        :param status:
+    """
+    if status.in_reply_to_status_id != None:
+        return True
     return False
 
 def IsDirectMessage(status):
@@ -442,7 +480,7 @@ def dataHandler(data, main):
         :param data:
     """
     if not "friends" in data:
-        if IsStatus(data) and not IsRetweet(data) and not HaveSent(me, data) and ((not main and IsMentionned(me, data)) or (main and HaveHashTag(data, Hashtag))):
+        if IsStatus(data) and not IsRetweet(data) and not HaveSent(me, data) and not IsReply(data) and ((not main and IsMentionned(me, data)) or (main and HaveHashTag(data, Hashtag))):
             handleImageStatus(data)
         if IsDirectMessage(data) and not HaveSent(me, data):
             handleCommand(data)
@@ -483,6 +521,15 @@ def handleCommand(command):
         elif cmd.lower().startswith('quote '):
             statusId = cmd[6:].split(' ')[0]
             quoteStatus(statusId)
+        elif cmd.lower().startswith('addfav '):
+            cmdr = cmd[7:]
+            userlist = config.items('BestUsers', raw=True)
+            user = (cmdr, str(len(userlist)+1))
+            if not user[0] in config['BestUsers']:
+                userlist.append(user)
+                config['BestUsers'] = dict(userlist)
+                with open(f"{filepath}/data/config.cfg", 'w') as configfile:
+                    config.write(configfile)
         elif cmd.lower().startswith("foo "):
             text = cmd[4:]
             logText("bar : " + text)
@@ -492,32 +539,30 @@ def quoteStatus(statusId):
     Function to quote the given status
         :param statusId:
     """
-    decoded = api.get_status(statusId)
-    sender = decoded.user.name
+    decoded = api.get_status(statusId, tweet_mode="extended")
     sendertag = decoded.user.screen_name
-    text = decoded.text
+    text = decoded.full_text
     media = set()
     media_files = set()
-    if hasattr(decoded, "extended_tweet"):
-        if hasattr(decoded.extended_tweet, "extended_entities"):
-            media = decoded.extended_tweet.extended_entities["media"]
-        elif hasattr(decoded.entities, "media"):
-            logText("Media in Entities")
-            media = decoded.entities["media"]
-    else:
-        if hasattr(decoded, "extended_entities"):
-            media = decoded.extended_entities["media"]
-        elif hasattr(decoded.entities, "media"):
-            media = decoded.entities["media"]
+    media = decoded.extended_entities["media"]
 
-    logText("Status n"+str(statusId)+" by @"+ sender + "\n\""+text+"\" ("+str(len(media)) + " media files)")
+    logText("Status n"+str(statusId)+" by @"+ sendertag+ "\n\""+text+"\" ("+str(len(media)) + " media files)")
     if len(media) >= 1:                                                 #Did we got some medias ?
         for i in media:
             media_files.add(i["media_url_https"])                       #Add medias to var
-        dlFiles, folder = dl(media_files, sendertag)                             #Get those medias in your files
-        ftpSend(dlFiles, folder)
-        qcode, qtext = random.choice(list(quoteText.items()))           #Get one of the quote answers
-        api.update_status(status=qtext+" https://twitter.com/"+sendertag+"/status/"+str(statusId))
+        dlFiles, folder = dl(media_files, sendertag)                    #Get those medias in your files
+        print(f"Folder {folder} updated : ")
+        for filename in dlFiles:
+            print(f" - {filename} created")
+        
+        if sendertag in bestUsers:
+            _, qtext = random.choice(list(superQuote.items()))
+            print(qtext.format(sendertag))
+            api.update_status(status=f"{qtext.format(sendertag)} https://twitter.com/{sendertag}/status/{statusId}")
+        else:
+            _, qtext = random.choice(list(quoteText.items()))           #Get one of the quote answers
+            api.update_status(status=f"{qtext} https://twitter.com/{sendertag}/status/{statusId}")
+        return True
     return False
 
 class mainStreamListener(tweepy.StreamListener): #MAIN STREAM TO HANDLE HASHTAG TREATMENT
@@ -587,23 +632,7 @@ try:    #Main loop
     logText("____[ INFORMATIONS ]____")
     logText("@"+me.screen_name)
     logText(str(me.followers_count)+" followers : ")
-    for follower in me.followers():     #Follower handler
-        if not follower.following:
-            try:
-                logText(" -"+follower.screen_name)
-                #follower.follow()
-            except tweepy.TweepError:
-                pass #Cuz I'm somehow getting errors here
-                #logError(421, str(tweepy.TweepError)+" Follow error.")
-    #for follower in api.friends_ids(me.id):
-    #   if (not api.lookup_friendships(me.id)):
-    #        try:
-    #            logText(" -"+follower.screen_name)
-    #            logText("I should unfollow this idiot.")
-    #            #follower.unfollow()
-    #        except tweepy.TweepError:
-    #            logError(421, str(tweepy.TweepError)+" Unfollow error.")
-
+    
     try:                                                #Starting streams
         if mainStream.running or cmdStream:
             logText("Stream already running.")
@@ -614,12 +643,12 @@ try:    #Main loop
     except:
         logText("Stream not Detected. Starting Stream...")
 
-    mainStream = tweepy.Stream(auth=api.auth, listener=mainStreamListener())
+    mainStream = tweepy.Stream(auth=api.auth, listener= mainStreamListener())
     time.sleep(3) #So twitter calms down a little
-    cmdStream = tweepy.Stream(auth=api.auth, listener=cmdStreamListener())
+    cmdStream = tweepy.Stream(auth=api.auth, listener= cmdStreamListener())
 
-    mainStream.filter(track=[Hashtag], async=True)
-    cmdStream.userstream(async=True)
+    mainStream.filter(track=[Hashtag], is_async=True)
+    cmdStream.userstream(is_async=True)
     shutdown = False
 
     if mainStream.running:

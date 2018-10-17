@@ -28,7 +28,7 @@
 
 #Basic informations
 __program__ = "EDPostcards Bot"
-__version__ = "2.2b"
+__version__ = "2.3a"
 
 ##Libraries imports
 import datetime
@@ -95,10 +95,10 @@ api = tweepy.API(auth)
 bigBoss = ["Foxlidev", "FoxliderAtom", "ED_Postcards"] #Put here your Twitter name to be an admin
 
 #Add texts here to increase the BOT's vocabulary and allow it to say more things !
-quoteText = dict(quote1='Oh man ! I neede to quote this pictures ! ',
-                 quote2='I love those ! This guy is a genius !',
-                 quote3='My program is telling me that this stuff is awesome and that I must quote it.',
-                 quote4='Oh my ! You really should watch this ! I am clearly not overreacting ! ',
+quoteText = dict(quote1='Oh man ! I need to quote these pictures ! ',
+                 quote2='I love those ! This guy is awesome !',
+                 quote3='My program is telling me that this stuff is awesome and that I must quote it. I agreed',
+                 quote4='Oh my ! You really should watch this ! I mean it !',
                  quote5="I'm happy to share these images with you.",
                  quote6="I may be a robot, but I know how to appreciate real ART !",
                  quote7="Here you go ! Fresh pictures out of my drives ! ",
@@ -120,20 +120,21 @@ quoteText = dict(quote1='Oh man ! I neede to quote this pictures ! ',
                  quote23="My core is heating just by looking at these pictures.",
                  quote24="I'd love to jump into one of those ships and enjoy the view.",
                  quote25="I'll force my developper to log me in his ship.",
-                 quote26="When i received these images, my cycles per second just stopped for a second !",
-                 quote27="Whoah ! My core temp just reached sky high !",
+                 quote26="When i received these images, my cycles per second stopped for a bit !",
+                 quote27="Whoah ! My core temperature just reached sky high !",
                  quote28="Oops ! My feeling core just overheated !",
                  quote29="After many tests by my AI, I can affirm that this is awesome.",
-                 quote30="Interesting things for sure",
+                 quote30="Interesting pictures for sure",
                  quote31="Pictures ! Pictures everywhere !",
                  quote32="Here you go ! Enjoy !",
                  quote33="And make sure to follow the author !",
                  quote34="I dare you to make a better one ! ",
                  quote35=" -- PRIMARY CORE ERROR : TOO AMAZING TO PROCESS --",
                  quote36=" -- DEBUG MESSAGE : awesomeness value caused critical memory overflow --",
-                 quote37=" -- DEBUG MESSAGE : imageQUality value is too big for double data type --",
+                 quote37=" -- DEBUG MESSAGE : imageQuality value is too big for double data type --",
                  quote38=" -- DEBUG MESSAGE : fImageTreatment returned error message : \"Too awesome\" --",
                  quote39=" -- Core overheated : Images are too much to handle --",
+                 quote40="I will spend some cycles to look and appreciate these images.",
                  quote50="I am running out of ideas for texts. But here you go ! ")
 
 
@@ -221,7 +222,7 @@ def logError(errnum=0, errtext=""):
     logsFile.write(log)
     print(log, end='')
     logsFile.close()
-    frestart() #Here till I find a way to prevent disconnects
+    #frestart() #Here till I find a way to prevent disconnects
 
 def dump(obj, nested_level=0, output=sys.stdout):
     """
@@ -318,7 +319,7 @@ def fshutdown():
         This function is supposed to shut down the bot by disconnecting each stream.
     """
     logText("Logging off...")
-    api.update_profile(location="In a debris field")
+    #api.update_profile(location="In a debris field")
     mainStream.disconnect()
     cmdStream.disconnect()
     logText("Shuting down...")
@@ -332,12 +333,23 @@ def frestart():
     """
     logText("Restarting...")
     try: #As I might be disconnected...
-        api.update_profile(location="In a debris field")
+        #api.update_profile(location="In a debris field")
         mainStream.disconnect()
         cmdStream.disconnect()
     except:
         pass
-    os.system("./../EDPostcards.sh")
+    time.sleep(60)
+    #os.system(f"./../EDPostcards.sh")
+
+def mainStartup():
+    mainStream = tweepy.Stream(auth=api.auth, listener= mainStreamListener())
+    mainStream.filter(track=[Hashtag], async=True)
+    time.sleep(3)
+    #cmdStream = tweepy.Stream(auth=api.auth, listener= cmdStreamListener())
+    #cmdStream.userstream(async=True)
+    cmdStream=None
+    return mainStream, cmdStream
+
 
 ##  CHECK FUNCTIONS
 def IsStatus(status):
@@ -347,6 +359,7 @@ def IsStatus(status):
     """
     if "in_reply_to_status_id" in status and not "event" in status:
         #logText("Is Status")
+        
         return True
     #logText("Is Not Status")
     return False
@@ -368,7 +381,7 @@ def IsReply(status):
     Function to test if the given object is a reply
         :param status:
     """
-    if status.in_reply_to_status_id != None:
+    if status["in_reply_to_status_id"] != None:
         return True
     return False
 
@@ -479,6 +492,7 @@ def dataHandler(data, main):
     Function to handle data like tweets or direct messages
         :param data:
     """
+    #logText(f"===== DATA =====\n{data}\n\n")
     if not "friends" in data:
         if IsStatus(data) and not IsRetweet(data) and not HaveSent(me, data) and not IsReply(data) and ((not main and IsMentionned(me, data)) or (main and HaveHashTag(data, Hashtag))):
             handleImageStatus(data)
@@ -546,7 +560,7 @@ def quoteStatus(statusId):
     media_files = set()
     media = decoded.extended_entities["media"]
 
-    logText("Status n"+str(statusId)+" by @"+ sendertag+ "\n\""+text+"\" ("+str(len(media)) + " media files)")
+    print("Status n"+str(statusId)+" by @"+ sendertag+ "\n\""+text+"\" ("+str(len(media)) + " media files)")
     if len(media) >= 1:                                                 #Did we got some medias ?
         for i in media:
             media_files.add(i["media_url_https"])                       #Add medias to var
@@ -575,17 +589,19 @@ class mainStreamListener(tweepy.StreamListener): #MAIN STREAM TO HANDLE HASHTAG 
         dataHandler(decoded, True)
 
     def on_error(self, status_code):
-        logText("Error Code: " + str(status_code))
-        logError(status_code, "Twitter API error. Refer to dev.twitter.com for more informations")
+        logText(f"[MAIN STREAM] ===== ERROR =====\n{status_code}\n\n")
+        logError(status_code, "[MAIN STREAM] Twitter API error. Refer to dev.twitter.com for more informations")
         if status_code == 420:
             frestart()
+            time.sleep(60)
             return False
-        frestart()
+        
+        #frestart()
         return True
 
     def on_timeout(self):
         logError(105, 'Timeout...')
-        frestart()
+        #frestart()
         return True
 
 class cmdStreamListener(tweepy.StreamListener): #THIS ONE IS USED FOR COMMANDS HANDLING ONLY
@@ -597,12 +613,16 @@ class cmdStreamListener(tweepy.StreamListener): #THIS ONE IS USED FOR COMMANDS H
         decoded = json.loads(status)
         dataHandler(decoded, False)
     def on_error(self, status_code):
-        logText("Error Code: " + str(status_code))
+        if status_code == 410:
+            return False #GODDAMN 410
+        logText(f"[CMD  STREAM] ===== ERROR =====\n{status_code}\n\n")
         logError(status_code, "Twitter API error. Refer to dev.twitter.com for more informations")
         if status_code == 420:
             frestart()
             return False
-        frestart()
+        
+        
+        #frestart()
         return True
     def on_timeout(self):
         logError(105, 'Timeout...')
@@ -617,7 +637,7 @@ verbose("BOT " + __program__ + " v" + __version__ + " started. \nVerbose activat
 try:    #Main loop
 
     try:        #API Settings
-        api.update_profile(location="Sol")
+        #api.update_profile(location="Sol")
         api.timeout = 240
         api.retry_count = 3
         api.wait_on_rate_limit = True
@@ -631,39 +651,27 @@ try:    #Main loop
         exit()
     logText("____[ INFORMATIONS ]____")
     logText("@"+me.screen_name)
-    logText(str(me.followers_count)+" followers : ")
+    logText(str(me.followers_count)+" followers ")
     
-    try:                                                #Starting streams
-        if mainStream.running or cmdStream:
-            logText("Stream already running.")
-            mainStream.disconnect()
-            cmdStream.disconnect()
-        else:
-            logText("Stream not running. Starting Stream...")
-    except:
-        logText("Stream not Detected. Starting Stream...")
+    while True:
+        try:
+            t = datetime.datetime.now()
+            print(f"[CORE] Update {t}")
+            api.update_profile(location=f"Last update : {t.day}/{t.month}/{t.year+1286} {t.hour}:{t.minute}:{t.second}")
 
-    mainStream = tweepy.Stream(auth=api.auth, listener= mainStreamListener())
-    time.sleep(3) #So twitter calms down a little
-    cmdStream = tweepy.Stream(auth=api.auth, listener= cmdStreamListener())
-
-    mainStream.filter(track=[Hashtag], is_async=True)
-    cmdStream.userstream(is_async=True)
-    shutdown = False
-
-    if mainStream.running:
-        logText("MainStream running.")
-    else:
-        logText("MainStream startup failed")
-        fshutdown()
-    if cmdStream.running:
-        logText("CMDStream running.")
-    else:
-        logText("CMDStream startup failed")
-        fshutdown()
-    time.sleep(2)
-    
-
+            if not 'mainStream' in locals() or not mainStream.running:
+                print('[CORE] Stream disconnected\n[CORE] Reconnecting...')
+                mainStream, cmdStream = mainStartup()
+                if mainStream.running:
+                    print('[CORE] Connected')
+                else:
+                    print('[CORE] Failed. Retrying in 30 seconds.')
+        except KeyboardInterrupt:
+            quit()
+        except Exception as e:
+            print(e)
+            continue
+        time.sleep(30)
 
 except tweepy.TweepError:
     logError(880, str(error))

@@ -28,7 +28,7 @@
 
 #Basic informations
 __program__ = "EDPostcards Bot"
-__version__ = "2.3a"
+__version__ = "2.3b"
 
 ##Libraries imports
 import datetime
@@ -71,12 +71,12 @@ except Exception as error:
 
 
 #Twitter AUTH
-CONSUMER_KEY = config["Keys"]["CONSUMER_KEY"]
-CONSUMER_SECRET = config["Keys"]["CONSUMER_SECRET"]
-ACCESS_KEY = config["Keys"]["ACCESS_KEY"]
-ACCESS_SECRET = config["Keys"]["ACCESS_SECRET"]
-auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
-auth.set_access_token(ACCESS_KEY, ACCESS_SECRET)
+#CONSUMER_KEY = config["Keys"]["CONSUMER_KEY"]
+#CONSUMER_SECRET = config["Keys"]["CONSUMER_SECRET"]
+#ACCESS_KEY = config["Keys"]["ACCESS_KEY"]
+#ACCESS_SECRET = config["Keys"]["ACCESS_SECRET"]
+auth = tweepy.OAuthHandler(config["Keys"]["CONSUMER_KEY"], config["Keys"]["CONSUMER_SECRET"])
+auth.set_access_token(config["Keys"]["ACCESS_KEY"], config["Keys"]["ACCESS_SECRET"])
 api = tweepy.API(auth)
 
 
@@ -136,7 +136,7 @@ quoteText = dict(quote1='Oh man ! I need to quote these pictures ! ',
                  quote39=" -- Core overheated : Images are too much to handle --",
                  quote40="I will spend some cycles to look and appreciate these images.",
                  quote50="I am running out of ideas for texts. But here you go ! ")
-
+profileDesc = "I'm the bot that gives you the best of #EDPostcards ! Created by @FoxliderAtom."
 
 superQuote = dict(
     quote1 = "Hey ! More pictures from {} ! ",
@@ -170,8 +170,8 @@ def verbose(text):
         if not os.path.exists(fold):
             os.makedirs(fold)
         today = datetime.datetime.now()
-        logsFile = open(fold +"/"+ str(today.year) + "-" + str(today.month) + "-" + str(today.day) + ".txt", "a")
-        log = "[" + str(today.hour) + ":" + str(today.minute) + ":" + str(today.second) + "] " + text + "\n"
+        logsFile = open(f"{fold}/{today.year}-{today.month}-{today.day}.txt", "a")
+        log = f"[{today.hour}:{today.minute}:{today.second}] {text}\n"
         logsFile.write(log)
         print(log, end='')
         logsFile.close()
@@ -187,7 +187,15 @@ def logStart():
     logsFile = open(f"{filepath}/logs/startup.txt", "a")
     log = f"[{today}] : Bot {__program__} v{__version__} logged in\n"
     logsFile.write(log)
+    if Verbose:
+        vfold = os.path.dirname(f"{filepath}/logs/verbose/")
+        if not os.path.exists(vfold):
+            os.makedirs(vfold)
+        vlogsFile = open(f"{vfold}/{today.year}-{today.month}-{today.day}.txt", "a")
+        vlogsFile.write(log)
+        vlogsFile.close()
     print(log, end='')
+    logsFile.close()
 
 def logText(text):
     """
@@ -202,6 +210,13 @@ def logText(text):
     today = datetime.datetime.now()
     logsFile = open(f"{fold}/{today.year}-{today.month}-{today.day}.txt", "a")
     log = f"[{today.hour}:{today.minute}:{today.second}] {text} \n"
+    if Verbose:
+        vfold = os.path.dirname(f"{filepath}/logs/verbose/")
+        if not os.path.exists(vfold):
+            os.makedirs(vfold)
+        vlogsFile = open(f"{vfold}/{today.year}-{today.month}-{today.day}.txt", "a")
+        vlogsFile.write(log)
+        vlogsFile.close()
     logsFile.write(log)
     print(log, end='')
     logsFile.close()
@@ -216,12 +231,19 @@ def logError(errnum=0, errtext=""):
     fold = os.path.dirname(f"{filepath}/logs/errorLogs/")
     if not os.path.exists(fold):
         os.makedirs(fold)
+    
     today = datetime.datetime.now()
     logsFile = open(f"{fold}/{today.year}-{today.month}-{today.day}.txt", "a")
     log = f"[{today.hour}:{today.minute}:{today.second}] 0x0{errnum} : {errtext}\n"
+    if Verbose:
+        vfold = os.path.dirname(f"{filepath}/logs/verbose/")
+        if not os.path.exists(vfold):
+            os.makedirs(vfold)
+        vlogsFile = open(f"{vfold}/{today.year}-{today.month}-{today.day}.txt", "a")
+        vlogsFile.write(log)
+        vlogsFile.close()
     logsFile.write(log)
     print(log, end='')
-    logsFile.close()
     #frestart() #Here till I find a way to prevent disconnects
 
 def dump(obj, nested_level=0, output=sys.stdout):
@@ -272,7 +294,7 @@ def dl(media_files, sender):
     for url in media_files:
         i += 1
         name = f"{today.day}-{today.month}_{today.hour}h{today.minute}_{i}.jpg"
-        logText(f"\n - Downloading media {i} : {url} to {folder}{name}")
+        logText(f"[ DL ] - Media {i} : {url} to {folder}{name}")
         try:
             wget.download(url, out=folder+name)
             dl_files.add(name)
@@ -348,7 +370,23 @@ def mainStartup():
     #cmdStream = tweepy.Stream(auth=api.auth, listener= cmdStreamListener())
     #cmdStream.userstream(async=True)
     cmdStream=None
-    return mainStream, cmdStream
+
+    startTime = datetime.datetime.now()
+    return mainStream, cmdStream, startTime
+
+def timedelta_str(dt):
+    days = dt.days
+    hours, r = divmod(dt.seconds, 3600)
+    minutes, sec = divmod(r, 60)
+
+    if minutes == 1 and sec == 1:
+        return '{0} days, {1} hours, {2} minute and {3} second.'.format(days,hours,minutes,sec)
+    elif minutes > 1 and sec == 1:
+        return '{0} days, {1} hours, {2} minutes and {3} second.'.format(days,hours,minutes,sec)
+    elif minutes == 1 and sec > 1:
+        return '{0} days, {1} hours, {2} minute and {3} seconds.'.format(days,hours,minutes,sec)
+    else:
+        return '{0} days, {1} hours, {2} minutes and {3} seconds.'.format(days,hours,minutes,sec)
 
 
 ##  CHECK FUNCTIONS
@@ -560,18 +598,19 @@ def quoteStatus(statusId):
     media_files = set()
     media = decoded.extended_entities["media"]
 
-    print("Status n"+str(statusId)+" by @"+ sendertag+ "\n\""+text+"\" ("+str(len(media)) + " media files)")
+    logText(f"[QUOTE] Status n{statusId} by @{sendertag}")
+    verbose(f"[QUOTE] \"{text}\" ({len(media)} media files)")
     if len(media) >= 1:                                                 #Did we got some medias ?
         for i in media:
             media_files.add(i["media_url_https"])                       #Add medias to var
         dlFiles, folder = dl(media_files, sendertag)                    #Get those medias in your files
-        print(f"Folder {folder} updated : ")
+        verbose(f"[QUOTE] Folder {folder} updated : ")
         for filename in dlFiles:
-            print(f" - {filename} created")
+            verbose(f"[QUOTE]  - {filename} created")
         
         if sendertag in bestUsers:
             _, qtext = random.choice(list(superQuote.items()))
-            print(qtext.format(sendertag))
+            verbose(qtext.format(sendertag))
             api.update_status(status=f"{qtext.format(sendertag)} https://twitter.com/{sendertag}/status/{statusId}")
         else:
             _, qtext = random.choice(list(quoteText.items()))           #Get one of the quote answers
@@ -631,9 +670,10 @@ class cmdStreamListener(tweepy.StreamListener): #THIS ONE IS USED FOR COMMANDS H
 
 ## The bot itself
 
-logText("BOT " + __program__ + " v" + __version__ + " started. \nConnection...")
+logText("BOT " + __program__ + " v" + __version__ + " started.")
 logStart()
-verbose("BOT " + __program__ + " v" + __version__ + " started. \nVerbose activated")
+verbose("  ____[ Verbose activated ]____")
+startTime = datetime.datetime.now()
 try:    #Main loop
 
     try:        #API Settings
@@ -643,33 +683,37 @@ try:    #Main loop
         api.wait_on_rate_limit = True
         api.wait_on_rate_limit_notify = True
         me = api.me()
-        logText("Logged in as @"+ me.screen_name +" !")
-        #print (vars(me))
+        logText("[CORE] Logged in as @"+ me.screen_name +" !")
     except tweepy.TweepError:
-        logText("Could not authenticate you. \nExiting the program.")
+        logText("[CORE] Could not authenticate you. \nExiting the program.")
         logError(420, str(tweepy.TweepError)+" Could not authenticate you.")
         exit()
-    logText("____[ INFORMATIONS ]____")
-    logText("@"+me.screen_name)
-    logText(str(me.followers_count)+" followers ")
-    
+    logText("[CORE] ____[ INFORMATIONS ]____")
+    logText(f"[CORE] {me.followers_count} followers ")
+    waitingTime = 0
     while True:
         try:
             t = datetime.datetime.now()
-            print(f"[CORE] Update {t}")
-            api.update_profile(location=f"Last update : {t.day}/{t.month}/{t.year+1286} {t.hour}:{t.minute}:{t.second}")
-
             if not 'mainStream' in locals() or not mainStream.running:
-                print('[CORE] Stream disconnected\n[CORE] Reconnecting...')
-                mainStream, cmdStream = mainStartup()
+                logText('[CORE] Stream disconnected')
+                logText('[CORE] Reconnecting...')
+                mainStream, cmdStream, startTime = mainStartup()
                 if mainStream.running:
-                    print('[CORE] Connected')
+                    logText('[CORE] Connected')
+                    waitingTime = 0
                 else:
-                    print('[CORE] Failed. Retrying in 30 seconds.')
+                    waitingTime += 30
+                    logText(f'[CORE] Failed. Retrying in {30+waitingTime} seconds.')
+            verbose(f"[CORE] Update {t}")
+            api.update_profile(location=f"Last update : {t.day}/{t.month}/{t.year+1286} {t.hour}:{t.minute}:{t.second}", description = f"{profileDesc} Uptime : {timedelta_str(t - startTime)}")
+            verbose(f"[CORE] Uptime : {timedelta_str(t - startTime)} ")
+            
+                    
         except KeyboardInterrupt:
             quit()
         except Exception as e:
-            print(e)
+            #print(e)
+            logError(50, e)
             continue
         time.sleep(30)
 

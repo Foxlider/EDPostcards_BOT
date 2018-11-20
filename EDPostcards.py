@@ -28,7 +28,7 @@
 
 #Basic informations
 __program__ = "EDPostcards Bot"
-__version__ = "2.3b"
+__version__ = "2.3c"
 
 ##Libraries imports
 import datetime
@@ -691,7 +691,8 @@ try:    #Main loop
     logText("[CORE] ____[ INFORMATIONS ]____")
     logText(f"[CORE] {me.followers_count} followers ")
     waitingTime = 0
-    while True:
+    running = True
+    while running:
         try:
             t = datetime.datetime.now()
             if not 'mainStream' in locals() or not mainStream.running:
@@ -709,17 +710,29 @@ try:    #Main loop
             verbose(f"[CORE] Uptime : {timedelta_str(t - startTime)} ")
             
                     
-        except KeyboardInterrupt:
-            quit()
+        except (KeyboardInterrupt, SystemExit):
+            logText('[CORE] System shutting down')
+            api.update_profile(location=f"System Offline", description = f"{profileDesc} [SYSTEM OFFLINE]")
+            os._exit(0)
         except Exception as e:
             #print(e)
             logError(50, e)
             continue
-        time.sleep(30)
+        try : 
+            time.sleep(30)
+        except (KeyboardInterrupt, SystemExit):
+            logText('[CORE] System shutting down')
+            api.update_profile(location=f"System Offline", description = f"{profileDesc} [SYSTEM OFFLINE]")
+            mainStream.disconnect()
+            os._exit(0)
+        except Exception as e:
+            #print(e)
+            logError(51, e)
+            continue
 
 except tweepy.TweepError:
     logError(880, str(error))
-    frestart()
+    os._exit(0)
 except Exception as error:
     logError(990, str(error))
-    frestart()
+    os._exit(0)
